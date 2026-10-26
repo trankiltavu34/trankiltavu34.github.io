@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "fr.outiker.poker",
+    "sha256_cert_fingerprints": ["13:1A:23:F8:9E:1B:BF:54:22:4F:44:CF:CB:85:C9:AC:3F:96:E6:48:F5:83:4D:45:4F:B6:38:79:A8:CE:78:1C"]
+  }
+}]
