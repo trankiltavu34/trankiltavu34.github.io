@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#86385f">
+<meta name="description" content="Apprendre le poker (Texas Hold'em) pas à pas : cartes, combinaisons, positions, déroulement d'une main, lecture du board, outs et calculs, avec exercices corrigés.">
+<title>Apprendre le poker</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icones/icone-192.png">
+<link rel="apple-touch-icon" href="icones/icone-192.png">
+<style>
+:root {
+  --bg: #f3e9ee; --bg2: #ead9e2; --blanc: #fff; --rose: #c27a9b; --prune: #86385f; --prune-f: #5c2343;
+  --lavande: #b7a2c8; --lav-c: #ede4f3; --menthe: #bfe0d2; --vert: #3f8f6e; --peche: #f0d0b8;
+  --texte: #3a2840; --doux: #82708a; --rouge: #b3264f; --rouge-c: #f0c2d0; --or: #c4a15a;
+  --ombre: 0 3px 10px rgba(90, 40, 70, .14); --ombre-f: 0 6px 18px rgba(90, 40, 70, .22);
+  --tapis: #6a4570; --tapis-b: #3e2743;
+  --serif: Georgia, "Noto Serif", "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--sans); color: var(--texte); min-height: 100vh;
+  background: radial-gradient(120% 60% at 50% 0%, #fbf4f7 0%, var(--bg) 55%, var(--bg2) 100%) fixed;
+  -webkit-user-select: none; user-select: none; overscroll-behavior-y: none;
+}
+button { font: inherit; color: inherit; border: none; background: none; cursor: pointer; }
+a { color: inherit; }
+#app { max-width: 560px; margin: 0 auto; padding-bottom: 40px; }
+
+/* ---------- barre du haut ---------- */
+.barre {
+  position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px;
+  padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
+  background: linear-gradient(135deg, var(--prune-f), var(--prune) 60%, #a14f78);
+  color: #fff; box-shadow: 0 2px 12px rgba(60, 20, 45, .3);
+}
+.barre h1 { flex: 1; margin: 0; font: italic 600 1.15rem var(--serif); letter-spacing: .3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.barre .rond { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-size: 1.2rem; background: rgba(255,255,255,.14); color: #fff; }
+.barre .rond:active { background: rgba(255,255,255,.28); }
+.filet { height: 2px; background: linear-gradient(90deg, transparent, var(--or), transparent); }
+
+/* ---------- accueil ---------- */
+.hero { text-align: center; padding: 26px 18px 8px; }
+.hero .eventail { height: 120px; display: flex; justify-content: center; align-items: flex-end; margin-bottom: 8px; }
+.hero .eventail svg { width: 70px; margin: 0 -10px; filter: drop-shadow(0 6px 10px rgba(90,40,70,.25)); }
+.hero .eventail svg:nth-child(1) { transform: rotate(-14deg) translateY(10px); }
+.hero .eventail svg:nth-child(2) { transform: translateY(-4px); z-index: 1; }
+.hero .eventail svg:nth-child(3) { transform: rotate(14deg) translateY(10px); }
+.hero h2 { font: italic 600 1.9rem var(--serif); color: var(--prune); margin: 6px 0 2px; }
+.hero p { margin: 0; color: var(--doux); font-style: italic; font-family: var(--serif); }
+.ornement { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px auto; color: var(--or); }
+.ornement::before, .ornement::after { content: ""; width: 70px; height: 1px; background: var(--or); }
+
+.lecons { padding: 6px 14px; display: grid; gap: 12px; }
+.lecon {
+  display: flex; align-items: center; gap: 14px; text-align: left; width: 100%;
+  padding: 14px; border-radius: 20px; background: var(--blanc); box-shadow: var(--ombre); border: 1px solid #ecdbe4;
+}
+.lecon:active { transform: scale(.985); }
+.lecon .num {
+  flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+  font: 700 1.2rem var(--serif); color: #fff; background: linear-gradient(135deg, var(--rose), var(--prune));
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.35), 0 0 0 2px var(--or);
+}
+.lecon .txt { flex: 1; min-width: 0; }
+.lecon .txt b { display: block; font: 700 1.02rem var(--serif); color: var(--prune); }
+.lecon .txt span { display: block; font-size: .85rem; color: var(--doux); margin-top: 2px; }
+.lecon .etoiles { font-size: .8rem; color: var(--or); margin-top: 4px; letter-spacing: 1px; }
+.lecon .fleche { color: var(--rose); font-size: 1.3rem; }
+
+.promo {
+  margin: 18px 14px 4px; padding: 18px; border-radius: 22px; color: #fff; position: relative; overflow: hidden;
+  background: linear-gradient(135deg, var(--prune-f), var(--prune) 55%, var(--rose)); box-shadow: var(--ombre-f);
+}
+.promo::after { content: "♠ ♥ ♣ ♦"; position: absolute; right: -6px; bottom: -14px; font-size: 3.4rem; opacity: .12; letter-spacing: -6px; }
+.promo h3 { margin: 0 0 6px; font: italic 600 1.2rem var(--serif); }
+.promo p { margin: 0 0 12px; font-size: .9rem; opacity: .92; line-height: 1.4; }
+.promo a { display: inline-block; padding: 10px 18px; border-radius: 30px; background: #fff; color: var(--prune); font-weight: 700; text-decoration: none; box-shadow: 0 0 0 2px var(--or); }
+.pied { text-align: center; color: var(--doux); font-size: .8rem; margin: 18px 0 0; }
+.pied button { text-decoration: underline; color: var(--doux); font-size: .8rem; }
+
+/* ---------- onglets ---------- */
+.onglets { display: flex; gap: 6px; padding: 12px 14px 4px; position: sticky; top: calc(58px + env(safe-area-inset-top)); z-index: 5; background: linear-gradient(var(--bg) 70%, transparent); }
+.onglets button {
+  flex: 1; padding: 10px 6px; border-radius: 30px; font-weight: 700; font-size: .88rem; color: var(--prune);
+  background: var(--blanc); box-shadow: var(--ombre); border: 1px solid #e6d3de;
+}
+.onglets button.actif { background: linear-gradient(135deg, var(--rose), var(--prune)); color: #fff; border-color: var(--prune); }
+.contenu { padding: 8px 14px; }
+
+/* ---------- blocs ---------- */
+.bloc { background: var(--blanc); border-radius: 22px; padding: 16px; box-shadow: var(--ombre); margin: 12px 0; border: 1px solid #ecdbe4; }
+.bloc h3 { margin: 0 0 8px; font: 700 1.25rem var(--serif); color: var(--prune); }
+.bloc p { margin: 6px 0; line-height: 1.45; font-size: .95rem; }
+.savoir { background: var(--lav-c); border: 1px solid var(--lavande); }
+.savoir h4 { margin: 0 0 8px; font: italic 700 1.05rem var(--serif); color: var(--prune); }
+.savoir ul { margin: 0; padding-left: 18px; }
+.savoir li { margin: 6px 0; line-height: 1.4; font-size: .9rem; }
+.savoir li::marker { color: var(--prune); }
+.indice { color: var(--doux); font-style: italic; font-size: .85rem; text-align: center; margin: 8px 0; }
+.titre-sec { font: 700 1.05rem var(--serif); color: var(--prune); margin: 18px 2px 6px; }
+.etiquette { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: .8rem; }
+.menthe { background: var(--menthe); } .peche { background: var(--peche); } .rose { background: #ecc0d3; } .lavande { background: #ddd0ea; } .rouge { background: var(--rouge-c); }
+
+/* ---------- puces / pastilles ---------- */
+.puces { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 8px 0; }
+.puce { padding: 8px 14px; border-radius: 30px; background: var(--blanc); border: 1.5px solid var(--lavande); font-weight: 700; font-size: .88rem; box-shadow: var(--ombre); }
+.puce.actif { background: var(--rose); border-color: var(--prune); color: #fff; }
+.puce.rouge-t { color: var(--rouge); } .puce.noir-t { color: #2e2238; }
+.puce.actif.rouge-t, .puce.actif.noir-t { color: #fff; }
+
+/* ---------- cartes ---------- */
+svg.carte { display: block; width: 100%; height: auto; filter: drop-shadow(0 2px 3px rgba(80,40,70,.22)); overflow: visible; }
+.grille-cartes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px 8px; }
+.cellule { text-align: center; }
+.cellule .f { font-size: .7rem; color: var(--doux); margin-top: 3px; }
+.cellule.choisie svg { transform: translateY(-5px); }
+.cellule svg { transition: transform .15s; }
+.detail-carte { display: flex; gap: 14px; align-items: flex-start; }
+.detail-carte .grande { width: 104px; flex: none; }
+.detail-carte .infos { flex: 1; min-width: 0; }
+.ligne-info { display: flex; gap: 8px; font-size: .88rem; margin: 5px 0; }
+.ligne-info span:first-child { color: var(--doux); width: 78px; flex: none; }
+.ligne-info span:last-child { font-weight: 700; }
+.points { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+.points i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--prune); display: inline-block; }
+.points i.p { background: var(--prune); }
+.rangee5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.rangee5.minis { gap: 4px; width: 150px; }
+
+/* ---------- échelle des combinaisons ---------- */
+.echelle { display: grid; gap: 8px; }
+.marche { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 18px; background: var(--blanc); box-shadow: var(--ombre); border: 1.5px solid #ecdbe4; width: 100%; text-align: left; }
+.marche.actif { border-color: var(--prune); background: var(--lav-c); }
+.marche .n { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: .85rem; }
+.marche b { flex: 1; font: 700 .98rem var(--serif); }
+.ouvert { margin: -2px 0 6px; padding: 14px; border-radius: 0 0 18px 18px; background: var(--blanc); border: 1.5px solid var(--prune); border-top: none; }
+.ouvert .rangee5 { margin-bottom: 10px; }
+
+/* ---------- tapis ---------- */
+.tapis { border-radius: 26px; padding: 12px; background: var(--tapis-b); box-shadow: var(--ombre-f); margin: 10px 0; }
+.tapis-in { border-radius: 20px; padding: 10px 10px 12px; background: radial-gradient(circle at 50% 30%, #7a5280, var(--tapis)); border: 1.5px solid var(--or); }
+.tapis .lbl { color: #f3e4f0; font-size: .75rem; font-weight: 700; text-align: center; margin: 2px 0 6px; letter-spacing: .3px; }
+.tapis .board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.tapis .mains { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+.tapis .mains .c { width: 19%; }
+.vide { aspect-ratio: 100/140; border-radius: 9px; background: rgba(255,255,255,.08); border: 1.5px dashed rgba(255,255,255,.35); }
+.pot { position: absolute; }
+
+/* ---------- table de positions ---------- */
+svg.table { display: block; width: 100%; height: auto; }
+svg.table .siege { cursor: pointer; }
+
+/* ---------- actions ---------- */
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.action { background: var(--blanc); border-radius: 18px; padding: 12px 10px; text-align: center; box-shadow: var(--ombre); border: 1px solid #e6d3de; }
+.action .ico { width: 40px; height: 40px; border-radius: 50%; margin: 0 auto 6px; display: grid; place-items: center; font-size: 1.15rem; font-weight: 700; }
+.action b { display: block; font: 700 1rem var(--serif); color: var(--prune); }
+.action i { display: block; font-size: .78rem; color: var(--doux); }
+.action p { font-size: .8rem; margin: 6px 0 0; line-height: 1.35; }
+.frise { display: flex; gap: 5px; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: none; }
+.frise::-webkit-scrollbar { display: none; }
+.frise .puce { flex: none; }
+
+/* ---------- boutons ---------- */
+.btn { display: block; width: 100%; padding: 13px 16px; border-radius: 30px; font-weight: 700; font-size: 1rem; text-align: center;
+  background: var(--blanc); border: 1.5px solid var(--lavande); box-shadow: var(--ombre); }
+.btn.principal { background: linear-gradient(135deg, var(--rose), var(--prune)); color: #fff; border-color: var(--prune); box-shadow: 0 4px 14px rgba(134,56,95,.35), 0 0 0 2px rgba(196,161,90,.45); }
+.btn:active { transform: scale(.98); }
+.deux-btn { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+
+/* ---------- exercices ---------- */
+.progres { text-align: center; color: var(--doux); font-size: .8rem; margin: 6px 0 2px; }
+.dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin: 4px 0 6px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--lavande); background: #fff; }
+.dots i.ok { background: var(--menthe); border-color: var(--vert); }
+.dots i.ko { background: var(--rouge-c); border-color: var(--rouge); }
+.dots i.cur { border-color: var(--prune); border-width: 2.5px; }
+.question { font: 700 1.25rem var(--serif); color: var(--prune); text-align: center; margin: 8px 6px 4px; line-height: 1.3; }
+.sous-q { text-align: center; color: var(--doux); font-size: .85rem; font-style: italic; margin-bottom: 6px; }
+.situation { background: var(--blanc); border-radius: 22px; padding: 22px 18px; text-align: center; font-weight: 700; font-size: 1.05rem; line-height: 1.45; box-shadow: var(--ombre); margin: 10px 0; border: 1px solid #ecdbe4; }
+.choix { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+.choix.une-col { grid-template-columns: 1fr; }
+.choix button { padding: 12px 8px; border-radius: 16px; background: var(--blanc); border: 1.5px solid var(--lavande); font-weight: 700; font-size: .9rem; box-shadow: var(--ombre); }
+.choix button:active { transform: scale(.97); }
+.choix button.bon { background: var(--menthe); border-color: var(--vert); }
+.choix button.faux { background: var(--rouge-c); border-color: var(--rouge); }
+.choix button.eteint { color: #b6a8bb; box-shadow: none; }
+.correction { border-radius: 20px; padding: 14px; text-align: center; font-weight: 700; line-height: 1.45; margin: 10px 0; animation: apparait .25s ease; }
+.correction.bon { background: var(--menthe); } .correction.faux { background: var(--rouge-c); }
+.correction small { display: block; font-weight: 500; margin-top: 6px; }
+.correction .minis { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 8px; }
+.correction .minis svg { width: 30px; }
+@keyframes apparait { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.duel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.duel .main { background: var(--blanc); border-radius: 18px; padding: 8px; box-shadow: var(--ombre); border: 2px solid transparent; text-align: center; }
+.duel .main.bon { border-color: var(--vert); } .duel .main.faux { border-color: var(--rouge); }
+.duel .main h5 { margin: 2px 0 6px; font: 700 .95rem var(--serif); color: var(--prune); }
+.duel .main .cinq { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.duel .main .nom { font-weight: 700; font-size: .8rem; margin-top: 6px; }
+.deux-grandes { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; padding: 8px 18px; }
+.deux-grandes .ou { font: italic 1.1rem var(--serif); color: var(--doux); }
+.cinq-cartes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 10px 0; }
+.final { text-align: center; }
+.final .score { font: 700 3.4rem var(--serif); color: var(--prune); margin: 6px 0; }
+.final .msg { font-size: 1rem; margin-bottom: 14px; }
+
+/* ---------- calculs ---------- */
+table.tab { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.tab th { color: var(--prune); font-family: var(--serif); padding: 6px 4px; text-align: center; }
+.tab td { padding: 7px 4px; text-align: center; }
+.tab td:nth-child(2) { text-align: left; }
+.tab tr:nth-child(even) td { background: var(--lav-c); }
+.stepper { display: flex; align-items: center; justify-content: space-between; margin: 8px 0; }
+.stepper span { font-weight: 700; font-size: .9rem; }
+.stepper div { display: flex; align-items: center; gap: 10px; }
+.stepper button { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--lavande); background: #fff; font-size: 1.3rem; font-weight: 700; color: var(--prune); box-shadow: var(--ombre); }
+.stepper output { min-width: 56px; text-align: center; font: 700 1.15rem var(--serif); color: var(--prune); }
+.calc { background: var(--lav-c); border-radius: 16px; padding: 10px 14px; }
+.calc div { font-weight: 700; margin: 6px 0; font-size: .92rem; }
+.verdict { border-radius: 30px; padding: 12px; text-align: center; font-weight: 700; margin-top: 12px; font-size: 1.05rem; }
+.verdict.bon { background: var(--menthe); border: 1.5px solid var(--vert); } .verdict.faux { background: var(--rouge-c); border: 1.5px solid var(--rouge); }
+.outs-liste { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; }
+.outs-liste svg { width: 31px; }
+.badge { flex: none; min-width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; }
+.methode li { margin: 8px 0; }
+.methode b { color: var(--prune); }
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ====================================================================
+//  Apprendre le poker — logique du jeu et contenu des leçons
+// ====================================================================
+"use strict";
+
+const ROUGE = "#b3264f", NOIR = "#2e2238";
+const COULEURS = [["♥", "Cœur", ROUGE], ["♦", "Carreau", ROUGE], ["♣", "Trèfle", NOIR], ["♠", "Pique", NOIR]];
+
+const VALEURS = [  // français, anglais, nom, article, remarque
+  ["2", "2", "Deux", "le ", "La plus petite carte du jeu."],
+  ["3", "3", "Trois", "le ", "Une carte basse."],
+  ["4", "4", "Quatre", "le ", "Une carte basse."],
+  ["5", "5", "Cinq", "le ", "Une carte basse, mais utile : elle termine la petite suite A-2-3-4-5."],
+  ["6", "6", "Six", "le ", "Une carte moyenne."],
+  ["7", "7", "Sept", "le ", "Une carte moyenne."],
+  ["8", "8", "Huit", "le ", "Une carte moyenne."],
+  ["9", "9", "Neuf", "le ", "La plus forte des cartes moyennes."],
+  ["10", "T", "Dix", "le ", "Dans les logiciels et les ranges, le 10 s'écrit souvent « T » (pour Ten)."],
+  ["V", "J", "Valet", "le ", "La première des figures. En anglais : Jack."],
+  ["D", "Q", "Dame", "la ", "Une figure. En anglais : Queen."],
+  ["R", "K", "Roi", "le ", "La plus forte des figures. En anglais : King."],
+  ["A", "A", "As", "l'", "La carte la plus forte du jeu ! Il peut aussi compter comme un 1 dans la petite suite A-2-3-4-5."],
+];
+const PLURIELS = ["Deux", "Trois", "Quatre", "Cinq", "Six", "Sept", "Huit", "Neuf", "Dix", "Valets", "Dames", "Rois", "As"];
+const FAMILLES = [[0, 3, "Cartes basses", "menthe"], [4, 7, "Cartes moyennes", "peche"], [8, 12, "Cartes hautes", "rose"]];
+
+const COMBINAISONS = [
+  { nom: "Carte haute", def: "Aucune combinaison : c'est la carte la plus haute qui compte.",
+    astuce: "On dit « hauteur As », « hauteur Roi »… Si deux joueurs ont la même carte haute, on compare la suivante, et ainsi de suite.",
+    ex: [[12, 3], [9, 0], [6, 2], [2, 1], [0, 0]] },
+  { nom: "Paire", def: "Deux cartes de la même valeur.",
+    astuce: "Si deux joueurs ont la même paire, ce sont les autres cartes (les « kickers ») qui départagent.",
+    ex: [[12, 1], [12, 3], [7, 0], [4, 2], [1, 0]] },
+  { nom: "Double paire", def: "Deux paires de valeurs différentes.",
+    astuce: "Entre deux doubles paires, on compare d'abord la plus haute paire, puis la deuxième, puis la 5e carte.",
+    ex: [[9, 0], [9, 3], [3, 1], [3, 2], [12, 2]] },
+  { nom: "Brelan", def: "Trois cartes de la même valeur.",
+    astuce: "Au Texas Hold'em, un brelan fait avec une paire en main s'appelle un « set ». Il est très bien caché !",
+    ex: [[5, 0], [5, 2], [5, 3], [11, 1], [0, 2]] },
+  { nom: "Quinte", def: "Cinq cartes qui se suivent, de couleurs mélangées. On dit aussi « suite ».",
+    astuce: "L'As peut faire la petite quinte A-2-3-4-5 ou la grande 10-V-D-R-A, mais il ne « tourne » pas : R-A-2-3-4 n'est pas une quinte.",
+    ex: [[4, 0], [5, 2], [6, 1], [7, 3], [8, 0]] },
+  { nom: "Couleur", def: "Cinq cartes de la même couleur (♥, ♦, ♣ ou ♠), dans n'importe quel ordre.",
+    astuce: "Piège classique : la couleur bat la quinte ! Entre deux couleurs, c'est la plus haute carte qui gagne.",
+    ex: [[0, 1], [5, 1], [7, 1], [9, 1], [11, 1]] },
+  { nom: "Full", def: "Un brelan + une paire.",
+    astuce: "On dit « full aux Dames par les 4 ». Entre deux fulls, c'est le brelan le plus fort qui gagne.",
+    ex: [[10, 0], [10, 2], [10, 3], [2, 1], [2, 3]] },
+  { nom: "Carré", def: "Quatre cartes de la même valeur.",
+    astuce: "Une main très rare : environ une fois toutes les 600 mains au Hold'em.",
+    ex: [[7, 0], [7, 1], [7, 2], [7, 3], [11, 0]] },
+  { nom: "Quinte flush", def: "Cinq cartes qui se suivent, toutes de la même couleur.",
+    astuce: "C'est une quinte ET une couleur en même temps. Entre deux quintes flush, celle qui monte le plus haut gagne.",
+    ex: [[3, 3], [4, 3], [5, 3], [6, 3], [7, 3]] },
+  { nom: "Quinte flush royale", def: "10, Valet, Dame, Roi, As, tous de la même couleur.",
+    astuce: "La main imbattable ! Si rare que beaucoup de joueurs ne l'ont jamais eue.",
+    ex: [[8, 0], [9, 0], [10, 0], [11, 0], [12, 0]] },
+];
+
+// ---------- outils ----------
+const rnd = n => Math.floor(Math.random() * n);
+const choix = a => a[rnd(a.length)];
+function melanger(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const echantillon = (a, n) => melanger(a).slice(0, n);
+const intervalle = (a, b) => Array.from({ length: b - a }, (_, i) => a + i);
+const PAQUET = []; for (let r = 0; r < 13; r++) for (let s = 0; s < 4; s++) PAQUET.push([r, s]);
+const cleCarte = c => c[0] * 4 + c[1];
+const famille = i => FAMILLES.find(f => i >= f[0] && i <= f[1]);
+function nomCarte(r, s, maj) {
+  const v = VALEURS[r]; let t = v[3] + v[2] + (s !== undefined && s !== null ? " de " + COULEURS[s][1] : "");
+  return maj ? t[0].toUpperCase() + t.slice(1) : t;
+}
+const rangTxt = (r, notation) => VALEURS[r][notation === "EN" ? 1 : 0];
+
+// ---------- évaluation ----------
+function evaluer(main) {
+  const rangs = main.map(c => c[0]);
+  const flush = new Set(main.map(c => c[1])).size === 1;
+  const uniq = new Set(rangs);
+  const u = [...uniq];
+  const roue = [12, 0, 1, 2, 3].every(x => uniq.has(x));
+  const suite = uniq.size === 5 && (Math.max(...u) - Math.min(...u) === 4 || roue);
+  if (suite && flush) return [8, 9, 10, 11, 12].every(x => uniq.has(x)) ? 9 : 8;
+  const comptes = u.map(r => rangs.filter(x => x === r).length).sort((a, b) => b - a);
+  if (comptes[0] === 4) return 7;
+  if (comptes[0] === 3 && comptes[1] === 2) return 6;
+  if (flush) return 5;
+  if (suite) return 4;
+  if (comptes[0] === 3) return 3;
+  if (comptes[0] === 2 && comptes[1] === 2) return 2;
+  if (comptes[0] === 2) return 1;
+  return 0;
+}
+
+function groupes(main) {  // [[rang, nombre], ...] triés par nombre puis rang
+  const m = new Map(); main.forEach(c => m.set(c[0], (m.get(c[0]) || 0) + 1));
+  return [...m.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0]);
+}
+
+function cleMain(main) {
+  const cat = evaluer(main);
+  if (cat === 4 || cat === 8 || cat === 9) {
+    const rs = new Set(main.map(c => c[0]));
+    const roue = [12, 0, 1, 2, 3].every(x => rs.has(x));
+    return [cat, roue ? 3 : Math.max(...rs)];
+  }
+  return [cat, ...groupes(main).map(g => g[0])];
+}
+function compCles(a, b) { for (let i = 0; i < Math.max(a.length, b.length); i++) { const x = a[i] ?? -1, y = b[i] ?? -1; if (x !== y) return x - y; } return 0; }
+
+function combinaisons5(n) {
+  const res = [];
+  for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) for (let c = b + 1; c < n; c++)
+    for (let d = c + 1; d < n; d++) for (let e = d + 1; e < n; e++) res.push([a, b, c, d, e]);
+  return res;
+}
+const COMBI = { 5: combinaisons5(5), 6: combinaisons5(6), 7: combinaisons5(7) };
+function meilleureMain(cartes) {  // [catégorie, indices]
+  let best = null, bestIdx = null;
+  for (const idx of COMBI[cartes.length]) {
+    const k = cleMain(idx.map(i => cartes[i]));
+    if (!best || compCles(k, best) > 0) { best = k; bestIdx = idx; }
+  }
+  return [best[0], bestIdx];
+}
+
+function cartesCombinaison(main, cat) {  // indices des cartes qui forment la combinaison
+  if ([4, 5, 6, 8, 9].includes(cat)) return new Set([0, 1, 2, 3, 4]);
+  if (cat === 0) { const h = Math.max(...main.map(c => c[0])); return new Set([main.findIndex(c => c[0] === h)]); }
+  const cpt = {}; main.forEach(c => cpt[c[0]] = (cpt[c[0]] || 0) + 1);
+  return new Set(main.map((c, i) => cpt[c[0]] >= 2 ? i : -1).filter(i => i >= 0));
+}
+
+function construire(cat) {
+  const autres = (ex, n) => echantillon(intervalle(0, 13).filter(r => !ex.includes(r)), n);
+  const memeRang = (r, n) => echantillon([0, 1, 2, 3], n).map(s => [r, s]);
+  const libres = rs => rs.map(r => [r, rnd(4)]);
+  if (cat === 9) { const s = rnd(4); return [8, 9, 10, 11, 12].map(r => [r, s]); }
+  if (cat === 8 || cat === 4) {
+    const d = (cat === 8 ? rnd(9) : rnd(10)) - 1;
+    const rs = d === -1 ? [12, 0, 1, 2, 3] : intervalle(d, d + 5);
+    if (cat === 8) { const s = rnd(4); return rs.map(r => [r, s]); }
+    return libres(rs);
+  }
+  if (cat === 7) { const r = rnd(13); return [...memeRang(r, 4), ...libres(autres([r], 1))]; }
+  if (cat === 6) { const [r, q] = echantillon(intervalle(0, 13), 2); return [...memeRang(r, 3), ...memeRang(q, 2)]; }
+  if (cat === 5) { const s = rnd(4); return echantillon(intervalle(0, 13), 5).map(r => [r, s]); }
+  if (cat === 3) { const r = rnd(13); return [...memeRang(r, 3), ...libres(autres([r], 2))]; }
+  if (cat === 2) { const [r, q] = echantillon(intervalle(0, 13), 2); return [...memeRang(r, 2), ...memeRang(q, 2), ...libres(autres([r, q], 1))]; }
+  if (cat === 1) { const r = rnd(13); return [...memeRang(r, 2), ...libres(autres([r], 3))]; }
+  return libres(echantillon(intervalle(0, 13), 5));
+}
+function generer(cat, exclues = []) {
+  const ex = new Set(exclues.map(cleCarte));
+  for (let t = 0; t < 3000; t++) {
+    const m = construire(cat);
+    if (new Set(m.map(cleCarte)).size === 5 && evaluer(m) === cat && !m.some(c => ex.has(cleCarte(c)))) return melanger(m);
+  }
+  return null;
+}
+
+function sequence(main, notation) {
+  let rs = main.map(c => c[0]).sort((a, b) => a - b);
+  if ([12, 0, 1, 2, 3].every(x => rs.includes(x))) rs = [12, 0, 1, 2, 3];
+  return rs.map(r => rangTxt(r, notation)).join("-");
+}
+function decrire(main, cat, notation) {
+  const g = groupes(main), suit = COULEURS[main[0][1]][1];
+  switch (cat) {
+    case 9: return `Quinte flush royale : 10, Valet, Dame, Roi, As, tous à ${suit} !`;
+    case 8: return `Quinte flush : cinq cartes qui se suivent (${sequence(main, notation)}), toutes à ${suit}.`;
+    case 7: return `Carré : quatre ${PLURIELS[g[0][0]]}.`;
+    case 6: return `Full : trois ${PLURIELS[g[0][0]]} et deux ${PLURIELS[g[1][0]]}.`;
+    case 5: return `Couleur : cinq cartes à ${suit}, qui ne se suivent pas.`;
+    case 4: return `Quinte : cinq valeurs qui se suivent (${sequence(main, notation)}), couleurs mélangées.`;
+    case 3: return `Brelan : trois ${PLURIELS[g[0][0]]}.`;
+    case 2: return `Double paire : deux ${PLURIELS[g[0][0]]} et deux ${PLURIELS[g[1][0]]}.`;
+    case 1: return `Paire : deux ${PLURIELS[g[0][0]]}.`;
+  }
+  return `Carte haute : aucune combinaison, on dit « hauteur ${VALEURS[Math.max(...main.map(c => c[0]))][2]} ».`;
+}
+
+const ROLES = {
+  0: ["la plus haute carte", "la 2e carte", "la 3e carte", "la 4e carte", "la 5e carte"],
+  1: ["la paire", "le kicker (la plus haute carte restante)", "le 2e kicker", "le 3e kicker"],
+  2: ["la plus haute paire", "la 2e paire", "le kicker (la 5e carte)"],
+  3: ["le brelan", "le kicker", "le 2e kicker"],
+  4: ["la hauteur de la quinte"], 5: ["la plus haute carte", "la 2e carte", "la 3e carte", "la 4e carte", "la 5e carte"],
+  6: ["le brelan du full", "la paire du full"], 7: ["le carré", "le kicker"], 8: ["la hauteur de la quinte flush"], 9: [],
+};
+function comparer(a, b) {  // [gagnant 0/1/2, explication]
+  const ka = cleMain(a), kb = cleMain(b), ca = ka[0], cb = kb[0];
+  if (ca !== cb) {
+    const g = ca > cb ? 0 : 1, cf = Math.max(ca, cb), m = [3, 6, 7].includes(cf);
+    return [g, `${COMBINAISONS[cf].nom} contre ${COMBINAISONS[Math.min(ca, cb)].nom.toLowerCase()} : ${m ? "le" : "la"} ${COMBINAISONS[cf].nom.toLowerCase()} est plus fort${m ? "" : "e"}, donc la main ${"AB"[g]} gagne.`];
+  }
+  for (let k = 1; k < Math.max(ka.length, kb.length); k++) {
+    const x = ka[k], y = kb[k];
+    if (x !== y) {
+      const g = x > y ? 0 : 1, nm = r => ([4, 8].includes(ca) && r === 3) ? "5 (quinte basse A-2-3-4-5)" : VALEURS[r][2];
+      const [w, l] = g === 0 ? [nm(x), nm(y)] : [nm(y), nm(x)];
+      return [g, `Les deux mains ont ${[3, 6, 7].includes(ca) ? "un" : "une"} ${COMBINAISONS[ca].nom.toLowerCase()} ! On compare ${ROLES[ca][k - 1]} : ${w} contre ${l}, donc la main ${"AB"[g]} gagne.`];
+    }
+  }
+  return [2, "Égalité parfaite : les deux mains ont exactement la même force, le pot est partagé !"];
+}
+
+// ---------- positions (leçon 3) ----------
+const POS_NOMS = { 6: ["BTN", "SB", "BB", "UTG", "HJ", "CO"], 9: ["BTN", "SB", "BB", "UTG", "UTG+1", "MP", "LJ", "HJ", "CO"] };
+const GROUPES = { blindes: ["Les blindes", "lavande"], debut: ["Début de parole", "menthe"], milieu: ["Milieu de parole", "peche"], fin: ["Fin de parole", "rose"] };
+const POS_INFO = {
+  BTN: ["Le Bouton", "Button / Dealer", "fin", "Le joueur devant qui est posé le jeton « D ». C'est la meilleure place : après le flop, il parle toujours en dernier et voit ce que tout le monde a fait."],
+  SB: ["La Petite blinde", "Small Blind", "blindes", "Juste à gauche du bouton. Elle doit miser la petite blinde (la moitié de la grosse) avant même de voir ses cartes. Après le flop, elle parle en premier : c'est la place la plus difficile."],
+  BB: ["La Grosse blinde", "Big Blind", "blindes", "Deux places à gauche du bouton. Elle doit miser la grosse blinde avant de voir ses cartes. Avant le flop, elle parle en dernier ; après le flop, elle parle très tôt."],
+  UTG: ["Under the Gun", "« Sous le pistolet »", "debut", "Juste à gauche de la grosse blinde. Avant le flop, c'est le premier à parler : tous les autres jouent après lui, il doit être prudent et jouer peu de mains."],
+  "UTG+1": ["Under the Gun +1", "UTG plus un", "debut", "Juste après UTG. Encore une place de début de parole : beaucoup de joueurs parlent après."],
+  MP: ["Middle Position", "Position du milieu", "milieu", "Au milieu de la table. On peut ouvrir un peu plus de mains qu'en début de parole."],
+  LJ: ["Lojack", "Lojack", "milieu", "Trois places avant le bouton. Une position du milieu, de plus en plus confortable."],
+  HJ: ["Hijack", "Hijack", "milieu", "Deux places avant le bouton. On commence à pouvoir jouer plus de mains."],
+  CO: ["Le Cutoff", "Cutoff", "fin", "Juste avant le bouton (à sa droite). Deuxième meilleure place : seuls le bouton et les blindes parlent après lui."],
+};
+function ordreParole(n, moment) { return moment === "pre" ? [...intervalle(3, n), 0, 1, 2] : [...intervalle(1, n), 0]; }
+const ordinal = k => k === 1 ? "1er" : k + "e";
+const OFFSETS_Q3 = { premier_pre: 3, dernier_pre: 2, premier_post: 1, dernier_post: 0, bouton_suivant: 1, sb: 1, bb: 2, co: -1, utg: 3 };
+const QUESTIONS_Q3 = {
+  position: ["Quelle est TA position (le siège ♡) ?", "On part du bouton et on tourne vers la gauche : Bouton, SB, BB, UTG…"],
+  premier_pre: ["Avant le flop, qui parle en premier ?", "Avant le flop, c'est UTG qui commence : le joueur juste à gauche de la grosse blinde."],
+  dernier_pre: ["Avant le flop, qui parle en dernier ?", "Avant le flop, la grosse blinde parle en dernier, puisqu'elle a déjà misé."],
+  premier_post: ["Après le flop, qui parle en premier ?", "Après le flop, c'est le premier joueur à gauche du bouton qui commence : la petite blinde."],
+  dernier_post: ["Après le flop, qui parle en dernier ?", "Après le flop, le bouton parle toujours en dernier : c'est pour ça que c'est la meilleure place !"],
+  bouton_suivant: ["À la main suivante, où sera le bouton ?", "Le bouton avance d'une place vers la gauche (sens des aiguilles d'une montre) à chaque main."],
+  sb: ["Qui doit payer la petite blinde ?", "La petite blinde est juste à gauche du bouton."],
+  bb: ["Qui doit payer la grosse blinde ?", "La grosse blinde est deux places à gauche du bouton."],
+  co: ["Où est le Cutoff (CO) ?", "Le Cutoff est juste avant le bouton, à sa droite."],
+  utg: ["Où est le joueur Under the Gun (UTG) ?", "UTG est juste à gauche de la grosse blinde."],
+};
+
+// ---------- déroulement de la main (leçon 4) ----------
+const MAIN_EX = [[12, 0], [11, 0]];
+const BOARD_EX = [[10, 0], [5, 2], [0, 0], [9, 1], [8, 3]];
+const ETAPES = [
+  ["Préflop", 0, "1,5 bb", "Les blindes sont posées puis chaque joueur reçoit 2 cartes cachées, rien que pour lui. Premier tour de mises : on commence par UTG (à gauche de la grosse blinde) et la grosse blinde parle en dernier.",
+    "Pas encore de combinaison, mais As-Roi de cœur : une très belle main de départ !", [], []],
+  ["Flop", 3, "7 bb", "Trois cartes communes sont retournées au milieu : tout le monde peut s'en servir. Deuxième tour de mises : on commence par le premier joueur encore en jeu à gauche du bouton.",
+    "Carte haute As… mais tu as 4 cœurs : il t'en manque un seul pour faire une couleur !", [0, 1], [0, 2]],
+  ["Turn", 4, "15 bb", "Une 4e carte commune arrive : le turn. Troisième tour de mises, toujours en commençant à gauche du bouton.",
+    "Toujours carte haute As. Il te manque un 10 pour la quinte, ou un cœur pour la couleur.", [0, 1], [0, 3]],
+  ["River", 5, "30 bb", "La 5e et dernière carte commune : la river. Dernier tour de mises.",
+    "Le 10 tombe : tu as une QUINTE à l'As (10-V-D-R-A) !", [0, 1], [0, 3, 4]],
+  ["Abattage", 5, "30 bb", "S'il reste au moins deux joueurs, on retourne ses cartes. Chacun fait la meilleure combinaison de 5 cartes avec ses 2 cartes + les 5 du milieu. La meilleure main gagne le pot. (Si tout le monde se couche avant, le dernier joueur gagne sans rien montrer.)",
+    "Tu montres ta quinte… et tu remportes le pot ♡", [0, 1], [0, 3, 4]],
+];
+const ACTIONS = [
+  ["Parole", "Check", "✓", "Ne rien miser et laisser parler le suivant. Possible seulement si personne n'a misé dans ce tour.", "menthe"],
+  ["Miser", "Bet", "●", "Mettre des jetons le premier dans ce tour de mises.", "peche"],
+  ["Suivre", "Call", "=", "Mettre la même somme que la mise en cours pour rester dans le coup.", "lavande"],
+  ["Relancer", "Raise", "▲", "Augmenter la mise en cours. Les autres doivent suivre, relancer ou se coucher.", "rose"],
+  ["Se coucher", "Fold", "✕", "Abandonner sa main… et les jetons déjà mis dans le pot.", "rouge"],
+  ["Tapis", "All-in", "★", "Miser tous ses jetons d'un coup. En No Limit, c'est possible à tout moment.", "lavande"],
+];
+const NOMS_ACTIONS = ACTIONS.map(a => a[0]);
+const CONNAISSANCES = [
+  ["Combien de cartes cachées reçoit chaque joueur au Texas Hold'em ?", ["1", "2", "3", "4"], "2", "Deux cartes, rien que pour toi. Les 5 autres seront communes, au milieu de la table."],
+  ["Combien de cartes sont retournées au flop ?", ["1", "2", "3", "5"], "3", "Le flop, ce sont les 3 premières cartes communes, retournées en même temps."],
+  ["Comment s'appelle la 4e carte commune ?", ["Le flop", "Le turn", "La river", "Le préflop"], "Le turn", "Flop (3 cartes), puis le turn (4e carte), puis la river (5e carte)."],
+  ["Comment s'appelle la 5e et dernière carte commune ?", ["Le flop", "Le turn", "La river", "L'abattage"], "La river", "La river est la dernière carte. Après elle, il reste un dernier tour de mises."],
+  ["Qu'est-ce qui vient juste après le flop ?", ["Le préflop", "Le turn", "La river", "L'abattage"], "Le turn", "L'ordre est : préflop, flop, turn, river, puis l'abattage."],
+  ["Combien y a-t-il de tours de mises au maximum dans une main ?", ["2", "3", "4", "5"], "4", "Un tour au préflop, un au flop, un au turn et un à la river."],
+  ["Après le flop, qui parle en premier ?", ["Le 1er joueur encore en jeu à gauche du bouton", "UTG", "Le bouton", "Celui qui a misé en dernier"], "Le 1er joueur encore en jeu à gauche du bouton", "Après le flop, on commence toujours à gauche du bouton, et le bouton parle en dernier."],
+  ["Avant le flop, qui parle en premier ?", ["La petite blinde", "UTG, à gauche de la grosse blinde", "Le bouton", "La grosse blinde"], "UTG, à gauche de la grosse blinde", "Avant le flop, les blindes ont déjà misé : on commence juste après elles."],
+  ["Que se passe-t-il si tous les joueurs se couchent sauf un ?", ["Il gagne le pot sans montrer ses cartes", "On redistribue les cartes", "Le pot est partagé", "On va quand même à l'abattage"], "Il gagne le pot sans montrer ses cartes", "Plus d'adversaire, plus de combat : le dernier joueur ramasse le pot."],
+  ["À l'abattage, avec combien de cartes fait-on sa combinaison ?", ["2", "5", "6", "7"], "5", "Une combinaison fait toujours 5 cartes : les 5 meilleures parmi tes 2 + les 5 du milieu."],
+  ["Peut-on gagner sans utiliser aucune de ses 2 cartes ?", ["Oui, si les 5 du milieu font ta meilleure main", "Non, il faut toujours en utiliser une", "Non, il faut utiliser les deux", "Seulement au bouton"], "Oui, si les 5 du milieu font ta meilleure main", "On dit qu'on « joue le board ». Dans ce cas, ceux qui jouent le board partagent souvent le pot."],
+];
+const SITUATIONS = [
+  ["Personne n'a misé avant toi dans ce tour. Tu ne veux pas mettre de jetons, mais tu veux rester dans le coup.", NOMS_ACTIONS, "Parole", "Quand personne n'a misé, tu peux dire « parole » (check) sans rien payer."],
+  ["Personne n'a misé avant toi dans ce tour. Tu poses 3 bb au milieu.", NOMS_ACTIONS, "Miser", "Tu es le premier à mettre des jetons dans ce tour : c'est une mise."],
+  ["Un joueur mise 4 bb. Tu mets 4 bb toi aussi pour voir la suite.", NOMS_ACTIONS, "Suivre", "Mettre exactement la même somme que la mise en cours, c'est suivre (call)."],
+  ["Un joueur mise 4 bb. Tu mets 12 bb.", NOMS_ACTIONS, "Relancer", "Tu augmentes la mise en cours : c'est une relance (raise)."],
+  ["Un joueur mise, ta main est trop faible : tu abandonnes le coup.", NOMS_ACTIONS, "Se coucher", "Abandonner, c'est se coucher (fold). Tu perds ce que tu as déjà mis."],
+  ["Tu pousses tous tes jetons au milieu.", NOMS_ACTIONS, "Tapis", "Miser tous ses jetons, c'est faire tapis (all-in)."],
+  ["Un joueur a misé avant toi. Laquelle de ces actions est IMPOSSIBLE ?", ["Parole", "Suivre", "Relancer", "Se coucher"], "Parole", "Dès que quelqu'un a misé, tu ne peux plus dire parole : il faut suivre, relancer ou te coucher."],
+  ["Personne n'a misé dans ce tour. Laquelle de ces actions est IMPOSSIBLE ?", ["Parole", "Miser", "Suivre", "Tapis"], "Suivre", "On ne peut pas suivre une mise qui n'existe pas ! Tu peux dire parole, miser ou faire tapis."],
+  ["Avant le flop, tu es UTG. Peux-tu dire « parole » ?", ["Oui", "Non, la grosse blinde compte comme une mise"], "Non, la grosse blinde compte comme une mise", "Avant le flop, la grosse blinde est déjà une mise : il faut au moins la suivre (ou se coucher)."],
+];
+
+// ---------- lire un board (leçon 5) ----------
+function tirerDonne5() {
+  for (;;) {
+    const d = echantillon(PAQUET, 7);
+    const cat = meilleureMain(d)[0];
+    if (cat <= 1 && Math.random() > 0.35) continue;
+    return d;
+  }
+}
+function analyser(vis, notation) {
+  const main = vis.slice(0, 2);
+  if (vis.length < 5) {
+    if (main[0][0] === main[1][0]) return { cat: 1, surl: new Set([0, 1]), texte: `Paire de ${PLURIELS[main[0][0]]} servie : une paire dès le départ !`, notes: [] };
+    const h = Math.max(main[0][0], main[1][0]);
+    return { cat: 0, surl: new Set([main[0][0] === h ? 0 : 1]), texte: `Pas encore de combinaison : hauteur ${VALEURS[h][2]}.`, notes: [] };
+  }
+  const [cat, idx] = meilleureMain(vis);
+  const cinq = idx.map(i => vis[i]);
+  const surl = new Set([...cartesCombinaison(cinq, cat)].map(j => idx[j]));
+  const notes = [];
+  if (cat >= 1 && [...surl].every(i => i >= 2)) notes.push("Attention : cette combinaison est entièrement au milieu, tous les joueurs l'ont aussi !");
+  if (vis.length < 7) {
+    if (cat < 5) for (let s = 0; s < 4; s++) if (vis.filter(c => c[1] === s).length === 4) notes.push(`Tirage couleur : 4 cartes à ${COULEURS[s][1]}, il en manque une pour la couleur.`);
+    if (cat < 4) {
+      const rs = new Set(vis.map(c => c[0]));
+      for (let d = -1; d < 9; d++) {
+        const f = d === -1 ? [12, 0, 1, 2, 3] : intervalle(d, d + 5);
+        if (f.filter(x => rs.has(x)).length === 4) { notes.push("Tirage quinte : il ne manque qu'une seule carte pour faire une quinte."); break; }
+      }
+    }
+  }
+  return { cat, surl, texte: decrire(cinq, cat, notation), notes };
+}
+
+// ---------- outs (leçon 6) ----------
+const restantes = vis => { const v = new Set(vis.map(cleCarte)); return PAQUET.filter(c => !v.has(cleCarte(c))); };
+function outsDe(vis, cible, special) {
+  if (special === "hautes") { const rs = [vis[0][0], vis[1][0]]; return restantes(vis).filter(c => rs.includes(c[0])); }
+  return restantes(vis).filter(c => meilleureMain([...vis, c])[0] >= cible);
+}
+const pctDeux = o => 100 * (1 - (47 - o) * (46 - o) / (47 * 46));
+const pctUne = o => 100 * o / 46;
+const TIRAGES = [
+  ["Tirage couleur", [[12, 0], [6, 0]], [[11, 0], [5, 0], [0, 2]], 5, null, "Tu as 4 cœurs. Il y a 13 cœurs dans le paquet, donc il en reste 13 − 4 = 9 : 9 outs pour la couleur."],
+  ["Quinte bilatérale", [[7, 3], [6, 1]], [[5, 2], [4, 0], [0, 1]], 4, null, "6-7-8-9 : 4 cartes qui se suivent, ouvertes des deux côtés. Un 5 ou un 10 fait la quinte : 4 cinq + 4 dix = 8 outs."],
+  ["Quinte ventrale", [[7, 3], [6, 1]], [[4, 2], [3, 0], [11, 1]], 4, null, "5-6-_-8-9 : il manque la carte du milieu (« ventrale » ou gutshot). Seuls les 4 sept font la quinte : 4 outs."],
+  ["Couleur + quinte", [[9, 0], [8, 0]], [[7, 0], [6, 0], [0, 2]], 4, null, "Le tirage monstre ! 9 cœurs pour la couleur + les Dames et les 7 qui ne sont pas à cœur (3 + 3) = 15 outs."],
+  ["Deux cartes hautes", [[12, 3], [11, 1]], [[7, 0], [4, 2], [0, 3]], 1, "hautes", "As et Roi sont plus hauts que tout le flop. Un As ou un Roi te donne une grosse paire : 3 + 3 = 6 outs."],
+  ["Paire → brelan", [[5, 3], [5, 1]], [[11, 2], [7, 0], [0, 1]], 3, null, "Tu as une paire de 7 en main. Il ne reste que 2 sept dans le paquet pour faire un brelan : 2 outs."],
+  ["Double paire → full", [[11, 3], [7, 1]], [[11, 2], [7, 0], [0, 1]], 6, null, "Rois et 9. Il reste 2 Rois et 2 neuf : chacun te donne un full. 4 outs."],
+  ["Brelan → full ou carré", [[5, 3], [5, 1]], [[5, 2], [11, 0], [0, 1]], 6, null, "Brelan de 7. Les 3 Rois et les 3 deux font le full, le dernier 7 fait le carré : 7 outs."],
+];
+const OBJECTIFS6 = { couleur: "faire ta couleur", oesd: "faire ta quinte", gutshot: "faire ta quinte", combo: "faire une quinte ou une couleur", set: "faire un brelan", doublepaire: "faire un full" };
+const RAISONS6 = {
+  couleur: "4 cartes d'une même couleur : il en reste 13 − 4 = 9.", oesd: "4 cartes qui se suivent, ouvertes des deux côtés : 4 + 4 = 8.",
+  gutshot: "Il manque une seule valeur au milieu de la quinte : 4 cartes.", combo: "Couleur (9) + les cartes de quinte qui ne sont pas déjà comptées dans la couleur.",
+  set: "Il ne reste que 2 cartes de la valeur de ta paire.", doublepaire: "Il reste 2 cartes de chaque valeur de tes deux paires : 2 + 2 = 4.",
+};
+const ATTENDU6 = { couleur: 9, oesd: 8, gutshot: 4, combo: 15, set: 2, doublepaire: 4 };
+const CIBLE6 = { couleur: 5, oesd: 4, gutshot: 4, combo: 4, set: 3, doublepaire: 6 };
+function construireTirage(typ) {
+  for (;;) {
+    let main, board;
+    if (typ === "couleur") {
+      const s = rnd(4), rs = echantillon(intervalle(0, 13), 5);
+      const c = [...rs.slice(0, 4).map(r => [r, s]), [rs[4], choix([0, 1, 2, 3].filter(x => x !== s))]];
+      main = c.slice(0, 2); board = c.slice(2);
+    } else if (["oesd", "gutshot", "combo"].includes(typ)) {
+      const r = typ === "gutshot" ? rnd(9) : 1 + rnd(7);
+      const rs = typ === "gutshot" ? [r, r + 1, r + 3, r + 4] : [r, r + 1, r + 2, r + 3];
+      const s = rnd(4);
+      const c = melanger(rs.map(x => [x, typ === "combo" ? s : rnd(4)]));
+      main = c.slice(0, 2); board = [...c.slice(2), [rnd(13), rnd(4)]];
+    } else if (typ === "set") {
+      const r = rnd(13), [s1, s2] = echantillon([0, 1, 2, 3], 2);
+      main = [[r, s1], [r, s2]]; board = echantillon(intervalle(0, 13).filter(x => x !== r), 3).map(x => [x, rnd(4)]);
+    } else {
+      const [a, b, x] = echantillon(intervalle(0, 13), 3);
+      main = [[a, rnd(4)], [b, rnd(4)]]; board = [[a, rnd(4)], [b, rnd(4)], [x, rnd(4)]];
+    }
+    if (Math.random() < 0.4) board.push([rnd(13), rnd(4)]);
+    const vis = [...main, ...board];
+    if (new Set(vis.map(cleCarte)).size !== vis.length) continue;
+    const n = ATTENDU6[typ], cible = CIBLE6[typ], cat = meilleureMain(vis)[0];
+    if (cat >= cible) continue;
+    if (["couleur", "oesd", "gutshot", "combo"].includes(typ)) { if (cat > 1 || outsDe(vis, 4).length !== n) continue; }
+    else if (typ === "set") { if (cat !== 1 || outsDe(vis, 3).length !== n || outsDe(vis, 4).length) continue; }
+    else if (cat !== 2 || outsDe(vis, 6).length !== n || outsDe(vis, 4).length !== n) continue;
+    return [melanger(main), board, outsDe(vis, cible)];
+  }
+}
+
+if (typeof module !== "undefined") module.exports = {
+  evaluer, meilleureMain, comparer, generer, cartesCombinaison, decrire, analyser, outsDe, construireTirage,
+  tirerDonne5, TIRAGES, COMBINAISONS, ATTENDU6, BOARD_EX, MAIN_EX, cleMain,
+};
+
+</script>
+<script>
+// ====================================================================
+//  Apprendre le poker — interface de l'application mobile
+// ====================================================================
+"use strict";
+
+// ⚠️ Mets ici le lien de ta boutique (Gumroad) : il apparaît dans toute l'appli.
+const BOUTIQUE_URL = "https://outiker.fr";
+const OR = "#c4a15a", PRUNE = "#86385f", VERT = "#3f8f6e";
+const SERIF = "Georgia, 'Noto Serif', 'Times New Roman', serif";
+const TEINTES = { menthe: "#bfe0d2", peche: "#f0d0b8", rose: "#e2a9c2", lavande: "#cdbbe0", rouge: "#f0c2d0" };
+
+const memoire = {
+  lire(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  ecrire(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* stockage indisponible */ } },
+};
+const etat = { notation: memoire.lire("notation", "FR"), route: ["accueil"], series: {} };
+
+// ---------------------------------------------------------------- cartes en SVG
+const PIPS = {
+  2: [[0, -1], [0, 1]], 3: [[0, -1], [0, 0], [0, 1]], 4: [[-1, -1], [1, -1], [-1, 1], [1, 1]],
+  5: [[-1, -1], [1, -1], [0, 0], [-1, 1], [1, 1]], 6: [[-1, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [1, 1]],
+  7: [[-1, -1], [1, -1], [0, -.5], [-1, 0], [1, 0], [-1, 1], [1, 1]],
+  8: [[-1, -1], [1, -1], [0, -.5], [-1, 0], [1, 0], [0, .5], [-1, 1], [1, 1]],
+  9: [[-1, -1], [1, -1], [-1, -1 / 3], [1, -1 / 3], [0, 0], [-1, 1 / 3], [1, 1 / 3], [-1, 1], [1, 1]],
+  10: [[-1, -1], [1, -1], [0, -2 / 3], [-1, -1 / 3], [1, -1 / 3], [-1, 1 / 3], [1, 1 / 3], [0, 2 / 3], [-1, 1], [1, 1]],
+};
+const FIGURES = { 9: "♞", 10: "♛", 11: "♚" };
+
+function defsSVG() {
+  return `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="gCarte" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f6f0ea"/></linearGradient>
+  <linearGradient id="gSurl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdeef4"/><stop offset="1" stop-color="#f1cfdd"/></linearGradient>
+  <radialGradient id="gTapis" cx=".5" cy=".4" r=".7"><stop offset="0" stop-color="#7d5583"/><stop offset="1" stop-color="#5e3a64"/></radialGradient>
+  <symbol id="s0" viewBox="0 0 100 100"><path d="M50 90C22 68 4 50 4 30 4 14 16 4 29 4c10 0 17 6 21 14 4-8 11-14 21-14 13 0 25 10 25 26 0 20-18 38-46 60z"/></symbol>
+  <symbol id="s1" viewBox="0 0 100 100"><path d="M50 3L87 50 50 97 13 50z"/></symbol>
+  <symbol id="s2" viewBox="0 0 100 100"><circle cx="50" cy="27" r="21"/><circle cx="27" cy="58" r="21"/><circle cx="73" cy="58" r="21"/><circle cx="50" cy="52" r="12"/><path d="M46 52c0 22-4 36-13 45h34c-9-9-13-23-13-45z"/></symbol>
+  <symbol id="s3" viewBox="0 0 100 100"><path d="M50 4C38 22 6 38 6 60c0 14 11 23 24 23 8 0 14-4 17-10-1 10-5 18-13 24h32c-8-6-12-14-13-24 3 6 9 10 17 10 13 0 24-9 24-23C94 38 62 22 50 4z"/></symbol>
+  </defs></svg>`;
+}
+
+function carte(r, s, o = {}) {
+  const col = COULEURS[s][2], rang = rangTxt(r, etat.notation);
+  const fond = o.surl ? "url(#gSurl)" : "url(#gCarte)";
+  let bord = "#d6c3cf", ep = 1.6;
+  if (o.bord) { bord = o.bord; ep = 5.5; } else if (o.choisie || o.surl) { bord = PRUNE; ep = 3.5; }
+  const use = (x, y, t, rot) => `<use href="#s${s}" x="${x - t / 2}" y="${y - t / 2}" width="${t}" height="${t}" fill="${col}"${rot ? ` transform="rotate(180 ${x} ${y})"` : ""}/>`;
+  const txt = (x, y, taille, t, extra = "") => `<text x="${x}" y="${y}" text-anchor="middle" font-family="${SERIF}" font-weight="700" font-size="${taille}" fill="${col}"${extra}>${t}</text>`;
+  let h = `<svg class="carte" viewBox="-4 -4 108 148" role="img" aria-label="${nomCarte(r, s)}"><rect x="0" y="0" width="100" height="140" rx="10" fill="${fond}" stroke="${bord}" stroke-width="${ep}"/>`;
+  if (o.mini) {
+    h += txt(50, 60, rang.length > 1 ? 40 : 52, rang) + use(50, 100, 44);
+  } else {
+    const coin = txt(13, 21, rang.length > 1 ? 15 : 19, rang) + use(13, 32, 12);
+    h += coin + `<g transform="rotate(180 50 70)">${coin}</g>`;
+    if (r <= 8) {
+      const t = r + 2 >= 9 ? 14 : 16;
+      for (const [px, py] of PIPS[r + 2]) h += use(50 + px * 19, 70 + py * 38.5, t, py > 0);
+    } else if (r <= 11) {
+      const teinte = s < 2 ? "#fbecf1" : "#efe9f4";
+      h += `<rect x="22" y="22" width="56" height="96" rx="5" fill="${teinte}" stroke="${OR}" stroke-width="1.6"/>`
+        + `<rect x="25.5" y="25.5" width="49" height="89" rx="4" fill="none" stroke="${OR}" stroke-opacity=".5" stroke-width=".8"/>`
+        + `<text x="50" y="58" text-anchor="middle" font-size="27" fill="${col}">${FIGURES[r]}︎</text>`
+        + txt(50, 93, 30, rang) + use(50, 106, 13);
+    } else {
+      h += `<circle cx="50" cy="70" r="31" fill="none" stroke="${OR}" stroke-width="1.6"/><circle cx="50" cy="70" r="27" fill="none" stroke="${OR}" stroke-opacity=".5" stroke-width=".8"/>`;
+      for (const [dx, dy] of [[0, -31], [31, 0], [0, 31], [-31, 0]]) h += `<circle cx="${50 + dx}" cy="${70 + dy}" r="2.4" fill="${OR}"/>`;
+      h += use(50, 70, 38);
+    }
+  }
+  return h + "</svg>";
+}
+const VIDE = `<div class="vide"></div>`;
+
+function tapisHTML(main, board, surl = new Set(), lbl = "le board (le milieu)", extra = "") {
+  const b = [0, 1, 2, 3, 4].map(k => board[k] ? carte(board[k][0], board[k][1], { surl: surl.has(k + 2) }) : VIDE).join("");
+  const m = main.map((c, k) => `<div class="c">${c ? carte(c[0], c[1], { surl: surl.has(k) }) : VIDE}</div>`).join("");
+  return `<div class="tapis"><div class="tapis-in"><div class="lbl">${lbl}</div><div class="board">${b}</div>
+    <div class="mains">${m}</div><div class="lbl" style="margin:7px 0 0">♡ tes 2 cartes${extra}</div></div></div>`;
+}
+
+// ---------------------------------------------------------------- table des positions
+function tableSVG(n, btn, o = {}) {
+  const cx = 180, cy = 162, rx = 124, ry = 90, sx = 156, sy = 128, R = 24;
+  const ordre = o.ordre ? ordreParole(n, o.ordre) : null;
+  let h = `<svg class="table" viewBox="0 0 360 336">
+    <ellipse cx="${cx}" cy="${cy + 5}" rx="${rx + 18}" ry="${ry + 18}" fill="rgba(70,30,60,.18)"/>
+    <ellipse cx="${cx}" cy="${cy}" rx="${rx + 16}" ry="${ry + 16}" fill="#3e2743"/>
+    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#gTapis)" stroke="${OR}" stroke-width="2"/>
+    <ellipse cx="${cx}" cy="${cy}" rx="${rx - 12}" ry="${ry - 12}" fill="none" stroke="#9a7aa0" stroke-width="1"/>
+    <text x="${cx}" y="${cy - 4}" text-anchor="middle" font-family="${SERIF}" font-style="italic" font-size="19" fill="#fff">Texas Hold'em</text>
+    <text x="${cx}" y="${cy + 16}" text-anchor="middle" font-size="9.5" fill="#ecdff0">↻ le jeu tourne vers la gauche</text>`;
+  for (let k = 0; k < n; k++) {
+    const a = (90 + k * 360 / n) * Math.PI / 180, x = cx + sx * Math.cos(a), y = cy + sy * Math.sin(a);
+    const dec = ((k - btn) % n + n) % n, nom = POS_NOMS[n][dec];
+    const fond = o.noms ? TEINTES[GROUPES[POS_INFO[nom][2]][1]] : "#fff";
+    let bord = "#fff", ep = 3;
+    if (o.marques && o.marques[k]) { bord = o.marques[k]; ep = 5; } else if (k === o.choisi) { bord = PRUNE; ep = 5; }
+    const rep = o.repSieges ? ` data-rep="${k}"` : o.act ? ` data-act="${o.act}:${k}"` : "";
+    h += `<g class="siege"${rep}><circle cx="${x}" cy="${y + 3}" r="${R}" fill="rgba(70,30,60,.22)"/><circle cx="${x}" cy="${y}" r="${R}" fill="${fond}" stroke="${bord}" stroke-width="${ep}"/>`;
+    if (o.noms) h += `<text x="${x}" y="${y + 4}" text-anchor="middle" font-weight="700" font-size="${nom.length > 3 ? 9.5 : 12}" fill="#3a2840">${nom}</text>`;
+    else if (k === 0) h += `<use href="#s0" x="${x - 9}" y="${y - 9}" width="18" height="18" fill="${PRUNE}"/>`;
+    if (ordre) {
+      const rg = ordre.indexOf(dec) + 1, bx = x + R * .75, by = y - R * .75;
+      h += `<circle cx="${bx}" cy="${by}" r="10" fill="${PRUNE}" stroke="#fff" stroke-width="2"/><text x="${bx}" y="${by + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${rg}</text>`;
+    }
+    if (k === 0) h += `<text x="${x}" y="${y + R + 13}" text-anchor="middle" font-size="11" font-weight="700" fill="${PRUNE}">♡ toi</text>`;
+    h += `</g>`;
+    const px = x + (cx - x) * .36, py = y + (cy - y) * .36;
+    if (dec === 0) h += `<circle cx="${px}" cy="${py}" r="11" fill="#fff" stroke="#3a2840" stroke-width="2"/><text x="${px}" y="${py + 4.5}" text-anchor="middle" font-weight="700" font-size="12" fill="#3a2840">D</text>`;
+    else if (o.blindes && (dec === 1 || dec === 2))
+      h += `<circle cx="${px}" cy="${py}" r="10" fill="${dec === 1 ? TEINTES.peche : TEINTES.rose}" stroke="#fff" stroke-width="2.5"/><text x="${px}" y="${py + 4}" text-anchor="middle" font-weight="700" font-size="10" fill="#3a2840">${dec === 1 ? "½" : "1"}</text>`;
+  }
+  return h + "</svg>";
+}
+
+// ---------------------------------------------------------------- les leçons
+const LECONS = [
+  null,
+  { titre: "Les cartes", desc: "Les 13 valeurs, les 4 couleurs, qui bat qui", onglets: [["dec", "Découvrir"], ["exo", "Exercice"]] },
+  { titre: "Les combinaisons", desc: "De la carte haute à la quinte flush royale", onglets: [["dec", "Découvrir"], ["exo", "Exercice"], ["bat", "Bataille"]] },
+  { titre: "Les positions", desc: "Le bouton, les blindes et l'ordre de parole", onglets: [["dec", "Découvrir"], ["exo", "Exercice"]] },
+  { titre: "Le déroulement de la main", desc: "Préflop, flop, turn, river et les actions", onglets: [["dec", "Découvrir"], ["exo", "Exercice"]] },
+  { titre: "Lire un board", desc: "Trouver sa combinaison à chaque étape", onglets: [["dec", "Découvrir"], ["exo", "Exercice"]] },
+  { titre: "Outs et calculs", desc: "Compter ses outs, règle du 2 et du 4, cote du pot", onglets: [["dec", "Découvrir"], ["exo", "Exercice"]] },
+];
+
+const promoHTML = () => `<div class="promo"><h3>Envie d'aller plus loin ?</h3>
+  <p>Découvre mes logiciels de poker pour ordinateur : entraînement sur fausses tables, ranges, analyse de tes sessions…</p>
+  <a href="${BOUTIQUE_URL}" target="_blank" rel="noopener">Voir la boutique ♡</a></div>`;
+
+function savoir(titre, items) { return `<div class="bloc savoir"><h4>✿ ${titre}</h4><ul>${items.map(i => `<li>${i}</li>`).join("")}</ul></div>`; }
+const points = (n, total) => `<span class="points">${Array.from({ length: total }, (_, k) => `<i class="${k < n ? "p" : ""}"></i>`).join("")}</span>`;
+const couleurDegrade = t => { const a = [183, 162, 200], b = [134, 56, 95]; return `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(",")})`; };
+
+// ---- Leçon 1
+const d1 = { s: 0, r: 12 };
+function dec1() {
+  const [fr, en, nom, , note] = VALEURS[d1.r];
+  const cle = v => v[etat.notation === "EN" ? 1 : 0];
+  const bas = VALEURS.slice(0, d1.r).map(cle).join(", "), haut = VALEURS.slice(d1.r + 1).map(cle).join(", ");
+  const fam = famille(d1.r);
+  return `<div class="bloc"><p style="text-align:center;margin:0">Un jeu = <b>52 cartes</b> : 13 valeurs × 4 couleurs.<br>Touche une carte pour tout savoir sur elle ♡</p>
+    <div class="puces">${COULEURS.map((c, k) => `<button class="puce ${k < 2 ? "rouge-t" : "noir-t"} ${k === d1.s ? "actif" : ""}" data-act="coul:${k}">${c[0]} ${c[1]}</button>`).join("")}</div>
+    <div class="puces"><button class="puce ${etat.notation === "FR" ? "actif" : ""}" data-act="nota:FR">Notation française</button><button class="puce ${etat.notation === "EN" ? "actif" : ""}" data-act="nota:EN">Anglaise</button></div></div>
+  <div class="grille-cartes">${VALEURS.map((v, i) => `<div class="cellule ${i === d1.r ? "choisie" : ""}" data-act="carte:${i}">${carte(i, d1.s, { choisie: i === d1.r })}<div class="f">force ${i + 1}</div></div>`).join("")}</div>
+  <div class="puces" style="margin-top:12px">${FAMILLES.map(f => `<span class="etiquette ${f[3]}">${f[2]}</span>`).join("")}</div>
+  <div class="bloc" id="detail"><h3>${nomCarte(d1.r, d1.s, true)}</h3><div class="detail-carte"><div class="grande">${carte(d1.r, d1.s)}</div><div class="infos">
+    <div class="ligne-info"><span>Force</span><span>${d1.r + 1} sur 13</span></div>${points(d1.r + 1, 13)}
+    <div class="ligne-info"><span>Abréviation</span><span>${fr} (FR) · ${en} (EN)</span></div>
+    <div class="ligne-info"><span>Famille</span><span><span class="etiquette ${fam[3]}">${fam[2]}</span></span></div>
+    <div class="ligne-info"><span>Elle bat</span><span>${bas || "aucune carte — c'est la plus faible"}</span></div>
+    <div class="ligne-info"><span>Battue par</span><span style="color:${haut ? "inherit" : PRUNE}">${haut || "aucune — c'est la plus forte !"}</span></div>
+  </div></div><p style="font-style:italic">♡ ${note}</p></div>
+  ${savoir("Bon à savoir", ["Les 4 couleurs ont exactement la même force : un Roi de ♥ vaut un Roi de ♠.", "Au poker, on dit « couleur » pour ♥ ♦ ♣ ♠ (en anglais : suit).", "L'As est la plus forte… mais peut aussi compter comme un 1 dans A-2-3-4-5."])}`;
+}
+
+// ---- Leçon 2
+const d2 = { ouvert: 9 };
+function dec2() {
+  let h = `<p class="indice">Touche une combinaison pour la voir en détail ♡</p><div class="indice" style="color:${PRUNE};font-weight:700">▲ la plus forte</div><div class="echelle">`;
+  for (let d = 0; d < 10; d++) {
+    const cat = 9 - d, info = COMBINAISONS[cat], dedans = cartesCombinaison(info.ex, cat);
+    h += `<button class="marche ${cat === d2.ouvert ? "actif" : ""}" data-act="combo:${cat}"><span class="n" style="background:${couleurDegrade(cat / 9)}">${d + 1}</span><b>${info.nom}</b>
+      <span class="rangee5 minis">${info.ex.map((c, k) => carte(c[0], c[1], { mini: true, surl: dedans.has(k) })).join("")}</span></button>`;
+    if (cat === d2.ouvert) {
+      h += `<div class="ouvert"><div class="rangee5">${info.ex.map((c, k) => carte(c[0], c[1], { surl: dedans.has(k) })).join("")}</div>
+        ${dedans.size < 5 ? `<p class="indice" style="margin:0 0 8px">en rose : les cartes qui forment la combinaison</p>` : ""}
+        <p><b>${info.def}</b></p><p style="font-style:italic">♡ ${info.astuce}</p>
+        <p class="indice" style="margin:4px 0 0">Rang ${10 - cat} sur 10 · ${cat === 9 ? "la plus forte de toutes" : cat === 0 ? "la plus faible de toutes" : `elle bat les ${cat} combinaisons en dessous`}</p></div>`;
+    }
+  }
+  return h + `</div><div class="indice">▼ la plus faible</div>` + savoir("Bon à savoir", ["Une combinaison se fait toujours avec 5 cartes.", "Au Texas Hold'em : 2 cartes en main + 5 au milieu = 7 cartes. Ta main est la meilleure combinaison de 5 cartes parmi les 7.", "Les couleurs (♥ ♦ ♣ ♠) ne départagent jamais deux mains."]);
+}
+
+// ---- Leçon 3
+const d3 = { n: 6, btn: 3, ordre: "pre", choisi: 0 };
+function dec3() {
+  const { n, btn } = d3, dec = ((d3.choisi - btn) % n + n) % n, nom = POS_NOMS[n][dec];
+  const [titre, anglais, grp, texte] = POS_INFO[nom], g = GROUPES[grp];
+  return `<div class="puces"><button class="puce ${n === 6 ? "actif" : ""}" data-act="nbj:6">6 joueurs</button><button class="puce ${n === 9 ? "actif" : ""}" data-act="nbj:9">9 joueurs</button></div>
+  <div class="puces"><button class="puce ${d3.ordre === "pre" ? "actif" : ""}" data-act="ordre:pre">Avant le flop</button><button class="puce ${d3.ordre === "post" ? "actif" : ""}" data-act="ordre:post">Après le flop</button></div>
+  ${tableSVG(n, btn, { noms: true, ordre: d3.ordre, blindes: true, choisi: d3.choisi, act: "siege" })}
+  <p class="indice" style="margin-top:0">Numéros roses = l'ordre dans lequel on parle · touche un siège</p>
+  <button class="btn principal" data-act="mainsuiv:1">▶ Main suivante (le bouton tourne)</button>
+  <div class="bloc"><h3>${titre}</h3><p class="indice" style="text-align:left;margin:0 0 6px">${nom} · ${anglais}</p><span class="etiquette ${g[1]}">${g[0]}</span>
+    <p>${texte}</p><p><b>Avant le flop : parle en ${ordinal(ordreParole(n, "pre").indexOf(dec) + 1)} sur ${n}<br>Après le flop : parle en ${ordinal(ordreParole(n, "post").indexOf(dec) + 1)} sur ${n}</b></p>
+    ${d3.choisi === 0 ? `<p style="color:${PRUNE};font-style:italic">♡ C'est ta place ce coup-ci. Touche « Main suivante » pour voir ta position changer.</p>` : ""}</div>
+  ${savoir("Bon à savoir", ["Nous apprenons le Texas Hold'em No Limit : chaque joueur reçoit 2 cartes cachées, puis 5 cartes communes arrivent au milieu.", "Le bouton « D » avance d'une place vers la gauche à chaque main : chacun passe à tour de rôle à chaque position.", "Les blindes sont des mises obligatoires (½ et 1) qui lancent le pot.", "Parler en dernier, c'est voir ce que font les autres avant de décider : un gros avantage !"])}`;
+}
+
+// ---- Leçon 4
+const d4 = { e: 0 };
+function dec4() {
+  const [nom, nb, pot, texte, taMain, sMain, sBoard] = ETAPES[d4.e];
+  const surl = new Set([...sMain, ...sBoard.map(k => k + 2)]);
+  const tours = ["1er tour de mises", "2e tour de mises", "3e tour de mises", "4e et dernier tour de mises", "on compare les mains"];
+  return `<div class="frise">${ETAPES.map((e, k) => `<button class="puce ${k === d4.e ? "actif" : ""}" data-act="etape:${k}">${k + 1} · ${e[0]}</button>`).join("")}</div>
+  ${tapisHTML(MAIN_EX, BOARD_EX.slice(0, nb), surl, "le milieu : les 5 cartes communes", ` · pot : ${pot}`)}
+  <div class="bloc"><h3>${nom}</h3><p class="indice" style="text-align:left;margin:0">Étape ${d4.e + 1} sur 5 · ${tours[d4.e]}</p><p>${texte}</p>
+    <div class="calc" style="color:${PRUNE};font-weight:700">♡ ${taMain}</div>
+    <div class="deux-btn"><button class="btn" data-act="etape:${(d4.e + 4) % 5}">◀ Précédente</button><button class="btn principal" data-act="etape:${(d4.e + 1) % 5}">Suivante ▶</button></div></div>
+  <div class="titre-sec">Les actions possibles quand c'est à toi</div>
+  <div class="actions">${ACTIONS.map(a => `<div class="action"><div class="ico ${a[4]}">${a[2]}</div><b>${a[0]}</b><i>${a[1]}</i><p>${a[3]}</p></div>`).join("")}</div>`;
+}
+
+// ---- Leçon 5
+const d5 = { donne: null, nb: 0 };
+function dec5() {
+  if (!d5.donne) d5.donne = tirerDonne5();
+  const vis = d5.donne.slice(0, 2 + d5.nb), a = analyser(vis, etat.notation);
+  const etape = { 0: "Préflop", 3: "Flop", 4: "Turn", 5: "River" }[d5.nb];
+  const lib = { 0: "Voir le flop ▶", 3: "Voir le turn ▶", 4: "Voir la river ▶" }[d5.nb];
+  return `${tapisHTML(d5.donne.slice(0, 2), d5.donne.slice(2, 2 + d5.nb), a.surl, "le board · " + etape)}
+  <div class="deux-btn"><button class="btn" data-act="donne:1">↻ Nouvelle donne</button>${lib ? `<button class="btn principal" data-act="voir:1">${lib}</button>` : `<button class="btn principal" data-act="donne:1">Encore ! ♡</button>`}</div>
+  <div class="bloc" style="border:1.5px solid var(--rose)"><p style="margin:0;text-align:center"><b>♡ Ta meilleure main :</b><br>${a.texte}</p>
+    ${a.notes.map(n => `<p class="indice" style="color:${PRUNE};font-weight:600">✿ ${n}</p>`).join("")}</div>
+  <div class="bloc savoir methode"><h4>✿ La méthode pour lire un board</h4><ol>
+    <li><b>Les paires</b> — une de tes cartes a-t-elle la même valeur qu'une carte du milieu ? Le milieu a-t-il deux cartes pareilles ?</li>
+    <li><b>Les groupes</b> — 3 fois la même valeur = brelan, 3 + 2 = full, 4 fois = carré.</li>
+    <li><b>La couleur</b> — compte les cartes de chaque couleur : 5 pareilles = couleur.</li>
+    <li><b>La quinte</b> — range les valeurs et cherche 5 valeurs qui se suivent (l'As en haut ou en bas).</li>
+    <li><b>Le bilan</b> — garde la plus forte… et vérifie si elle est entièrement au milieu : si oui, les autres l'ont aussi !</li></ol></div>`;
+}
+
+// ---- Leçon 6
+const d6 = { sec: 0, t: 0, pot: 20, mise: 10, outs: 9 };
+function dec6() {
+  let h = `<div class="puces">${["Les outs", "Règle du 2 et du 4", "Cote du pot"].map((t, k) => `<button class="puce ${k === d6.sec ? "actif" : ""}" data-act="sec:${k}">${t}</button>`).join("")}</div>`;
+  if (d6.sec === 0) {
+    h += `<p class="indice">Un out = une carte qui peut tomber et améliorer ta main (en une main qui a de bonnes chances de gagner).</p><div class="echelle">`;
+    TIRAGES.forEach(([nom, main, flop, cible, sp, expl], k) => {
+      const outs = outsDe([...main, ...flop], cible, sp), n = outs.length;
+      h += `<button class="marche ${k === d6.t ? "actif" : ""}" data-act="tir:${k}"><b>${nom}</b><span class="badge" style="background:${couleurDegrade(n / 15)}">${n}</span></button>`;
+      if (k === d6.t) {
+        h += `<div class="ouvert">${tapisHTML(main, flop, new Set(), "le flop")}<p>${expl}</p><p class="indice" style="text-align:left;margin:4px 0">Les cartes qui t'aident :</p>
+        <div class="outs-liste">${outs.sort((a, b) => b[0] - a[0] || a[1] - b[1]).map(c => carte(c[0], c[1], { mini: true })).join("")}</div>
+        <div class="calc"><div>Au flop (2 cartes à venir) : ${n} × 4 ≈ ${n * 4} % <small style="color:var(--doux)">(réel ${pctDeux(n).toFixed(0)} %)</small></div>
+        <div>Au turn (1 carte à venir) : ${n} × 2 ≈ ${n * 2} % <small style="color:var(--doux)">(réel ${pctUne(n).toFixed(0)} %)</small></div></div></div>`;
+      }
+    });
+    h += `</div>`;
+  } else if (d6.sec === 1) {
+    const lignes = [[2, "Paire → brelan"], [4, "Ventrale, double paire → full"], [6, "Deux cartes hautes"], [7, "Brelan → full/carré"], [8, "Quinte bilatérale"], [9, "Tirage couleur"], [12, "Couleur + ventrale"], [15, "Couleur + bilatérale"]];
+    h += `<div class="bloc"><h3>Tes outs en pourcentage, de tête</h3><p>Au <b>flop</b>, il reste 2 cartes à venir : multiplie tes outs par <b>4</b>.</p><p>Au <b>turn</b>, il ne reste qu'une carte : multiplie par <b>2</b>.</p>
+      <p style="font-style:italic">Exemple : tirage couleur au flop = 9 × 4 ≈ 36 % de faire ta couleur d'ici la river.</p></div>
+      <div class="bloc" style="padding:10px 8px"><table class="tab"><tr><th>Outs</th><th>Exemple</th><th>Flop ×4</th><th>Turn ×2</th></tr>
+      ${lignes.map(([o, e]) => `<tr><td><b>${o}</b></td><td>${e}</td><td><b>≈ ${o * 4} %</b><br><small style="color:var(--doux)">réel ${pctDeux(o).toFixed(0)} %</small></td><td><b>≈ ${o * 2} %</b><br><small style="color:var(--doux)">réel ${pctUne(o).toFixed(0)} %</small></td></tr>`).join("")}</table></div>
+      <p class="indice">La règle × 4 exagère un peu quand tu as beaucoup d'outs, mais elle suffit largement pour décider à la table ♡</p>`;
+  } else {
+    const { pot, mise, outs } = d6, fin = pot + 2 * mise, besoin = 100 * mise / fin, chance = 2 * outs, ok = chance >= besoin;
+    const st = (cle, lib, u) => `<div class="stepper"><span>${lib}</span><div><button data-act="pas:${cle}:-1">−</button><output>${d6[cle]}${u}</output><button data-act="pas:${cle}:1">+</button></div></div>`;
+    h += `<div class="bloc"><h3>La cote du pot</h3><p>Quand un adversaire mise, tu dois payer pour continuer. Est-ce que ça vaut le coup ?</p>
+      <ol style="padding-left:20px;line-height:1.45;font-size:.92rem"><li>Pot final = le pot + la mise adverse + ce que tu paies.</li><li>Il te faut : ce que tu paies ÷ le pot final.</li><li>Ta chance : tes outs × 2 (au turn).</li><li>Ta chance est plus grande ? Tu peux suivre. Sinon : couche-toi !</li></ol></div>
+      <div class="bloc"><h3 style="text-align:center">✿ Essaie toi-même ✿</h3>${st("pot", "Le pot", " €")}${st("mise", "La mise adverse", " €")}${st("outs", "Tes outs (au turn)", "")}
+      <div class="calc"><div>Tu dois payer : ${mise} €</div><div>Pot final : ${pot} + ${mise} + ${mise} = ${fin} €</div><div>Il te faut : ${mise} ÷ ${fin} ≈ ${besoin.toFixed(0)} %</div><div>Ta chance : ${outs} × 2 ≈ ${chance} %</div></div>
+      <div class="verdict ${ok ? "bon" : "faux"}">${ok ? "✔ Suivre est rentable" : "✕ Pas rentable : couche-toi"}</div></div>`;
+  }
+  return h;
+}
+const DEC = [null, dec1, dec2, dec3, dec4, dec5, dec6];
+
+// ---------------------------------------------------------------- exercices
+const C = (v, l) => ({ v: String(v), l });
+const choixCombos = () => [9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map(k => C(k, COMBINAISONS[k].nom));
+
+function serie1() {
+  return intervalle(0, 10).map(() => {
+    let a, b;
+    if (Math.random() < .2) { const r = rnd(13), [s1, s2] = echantillon([0, 1, 2, 3], 2); a = [r, s1]; b = [r, s2]; }
+    else { const [r1, r2] = echantillon(intervalle(0, 13), 2); a = [r1, rnd(4)]; b = [r2, rnd(4)]; }
+    const bonne = a[0] === b[0] ? "2" : a[0] > b[0] ? "0" : "1";
+    let expl;
+    if (bonne === "2") expl = `Même valeur (${VALEURS[a[0]][2]}), donc même force : la couleur ne compte pas !`;
+    else { const [f, l] = bonne === "0" ? [a, b] : [b, a]; expl = `${nomCarte(f[0], null, true)} (force ${f[0] + 1}) bat ${nomCarte(l[0])} (force ${l[0] + 1}).`; }
+    return {
+      titre: "Touche la carte la plus forte", sous: "Si elles ont la même force : « Égalité »", bonne, expl,
+      visuel: rep => `<div class="deux-grandes">${[a, b].map((c, k) => `<div data-rep="${k}">${carte(c[0], c[1], { bord: rep === null ? null : (bonne === String(k) ? VERT : rep === String(k) ? "#b3264f" : null) })}</div>`).join(`<span class="ou">ou</span>`)}</div>`,
+      choix: [C(2, "= Égalité")], uneCol: true,
+    };
+  });
+}
+function serie2() {
+  return melanger([...intervalle(0, 10), ...intervalle(0, 10)]).map(cat => {
+    const main = generer(cat);
+    return {
+      titre: "Quelle est cette combinaison ?", bonne: String(cat), expl: decrire(main, cat, etat.notation), compteur: "Main",
+      visuel: rep => { const d = rep === null ? new Set() : cartesCombinaison(main, cat); return `<div class="cinq-cartes">${main.map((c, k) => carte(c[0], c[1], { surl: d.has(k) })).join("")}</div>`; },
+      choix: choixCombos(),
+    };
+  });
+}
+const POIDS = [3, 3, 3, 2.5, 2, 2, 2, 1.2, .8, .3];
+const tirerPoids = () => { let x = Math.random() * POIDS.reduce((a, b) => a + b); for (let k = 0; k < 10; k++) { x -= POIDS[k]; if (x < 0) return k; } return 0; };
+function serieBat() {
+  return intervalle(0, 10).map(() => {
+    let a, b = null;
+    while (!b) { const ca = tirerPoids(), cb = Math.random() < .35 && ca !== 9 ? ca : tirerPoids(); a = generer(ca); b = generer(cb, a); }
+    const [g, expl] = comparer(a, b);
+    return {
+      titre: "⚔ Quelle main gagne ? ⚔", sous: "Touche la main gagnante, ou « Égalité »", bonne: String(g), expl, compteur: "Duel",
+      visuel: rep => `<div class="duel">${[a, b].map((m, k) => {
+        const cat = evaluer(m), d = rep === null ? new Set() : cartesCombinaison(m, cat);
+        const cls = rep === null ? "" : (g === k || g === 2) ? "bon" : rep === String(k) ? "faux" : "";
+        return `<div class="main ${cls}" data-rep="${k}"><h5>Main ${"AB"[k]}${rep !== null && g === k ? " ✔" : ""}</h5><div class="cinq">${m.map((c, j) => carte(c[0], c[1], { surl: d.has(j) })).join("")}</div>${rep !== null ? `<div class="nom">${COMBINAISONS[cat].nom}</div>` : ""}</div>`;
+      }).join("")}</div>`,
+      choix: [C(2, "= Égalité")], uneCol: true,
+    };
+  });
+}
+function serie3() {
+  const autres = Object.keys(QUESTIONS_Q3).filter(t => t !== "position");
+  let types = [...Array(5).fill("position"), ...melanger(autres)];
+  while (types.length < 15) types.push(choix(autres));
+  return melanger(types.slice(0, 15)).map(typ => {
+    const n = Math.random() < .65 ? 6 : 9, btn = rnd(n), [q, ex] = QUESTIONS_Q3[typ];
+    const bonne = typ === "position" ? POS_NOMS[n][((0 - btn) % n + n) % n] : String(((btn + OFFSETS_Q3[typ]) % n + n) % n);
+    const pos = typ === "position";
+    return {
+      titre: q, sous: `Table à ${n} joueurs${pos ? "" : " · touche le bon siège"}`, bonne,
+      expl: pos ? `Tu es ${POS_INFO[bonne][0].toLowerCase()} (${bonne}). ${ex}` : ex,
+      visuel: rep => {
+        const marques = {};
+        if (rep !== null) { if (pos) marques[0] = rep === bonne ? VERT : "#b3264f"; else { marques[+bonne] = VERT; if (rep !== bonne) marques[+rep] = "#b3264f"; } }
+        return tableSVG(n, btn, { noms: rep !== null, marques, repSieges: !pos && rep === null });
+      },
+      choix: pos ? POS_NOMS[n].map(x => C(x, x)) : null,
+    };
+  });
+}
+function serie4() {
+  const qs = [];
+  for (const [q, ch, b, ex] of echantillon(SITUATIONS, 5))
+    qs.push({ titre: ch === NOMS_ACTIONS ? "Quelle est cette action ?" : "Situation", texte: q, bonne: b, expl: ex, choix: ch.map(x => C(x, x)) });
+  for (const [q, ch, b, ex] of echantillon(CONNAISSANCES, 5)) qs.push({ titre: q, bonne: b, expl: ex, choix: ch.map(x => C(x, x)) });
+  for (let i = 0; i < 2; i++) {
+    const p = echantillon(PAQUET, 7), k = choix([0, 3, 4, 5]), b = { 0: "Préflop", 3: "Flop", 4: "Turn", 5: "River" }[k];
+    qs.push({ titre: "À quelle étape de la main sommes-nous ?", tapis: [p.slice(0, 2), p.slice(2, 2 + k), null], bonne: b,
+      expl: { 0: "Aucune carte au milieu : on est au préflop.", 3: "3 cartes au milieu : c'est le flop.", 4: "4 cartes au milieu : la 4e est le turn.", 5: "5 cartes au milieu : la dernière est la river." }[k],
+      choix: ["Préflop", "Flop", "Turn", "River"].map(x => C(x, x)) });
+  }
+  while (qs.length < 15) {
+    let p, cat, idx;
+    for (;;) { p = echantillon(PAQUET, 7); [cat, idx] = meilleureMain(p); if (cat === 0 && Math.random() > .25) continue; if (cat === 1 && Math.random() > .5) continue; break; }
+    const cinq = idx.map(i => p[i]), surl = new Set([...cartesCombinaison(cinq, cat)].map(j => idx[j]));
+    qs.push({ titre: "Quelle est ta meilleure combinaison ?", tapis: [p.slice(0, 2), p.slice(2), surl], bonne: String(cat),
+      expl: decrire(cinq, cat, etat.notation) + " (les 5 meilleures cartes parmi tes 2 + les 5 du milieu)", choix: choixCombos() });
+  }
+  return melanger(qs).map(q => ({
+    ...q, visuel: rep => q.tapis ? tapisHTML(q.tapis[0], q.tapis[1], rep !== null && q.tapis[2] ? q.tapis[2] : new Set()) : `<div class="situation">${q.texte || "✿ Question de cours ✿"}</div>`,
+    uneCol: q.choix.some(c => c.l.length > 18),
+  }));
+}
+function serie5() {
+  const qs = [], noms = ["le flop", "le turn", "la river"];
+  for (let m = 0; m < 8; m++) {
+    const d = tirerDonne5();
+    for (let e = 0; e < 3; e++) {
+      const vis = d.slice(0, 5 + e), a = analyser(vis, etat.notation);
+      qs.push({
+        titre: `Quelle combinaison as-tu après ${noms[e]} ?`, compteurTxt: `Main ${m + 1} sur 8 · ${["Flop", "Turn", "River"][e]}`,
+        bonne: String(a.cat), expl: a.texte + (a.notes.length ? `<small>${a.notes.join("<br>")}</small>` : ""),
+        visuel: rep => tapisHTML(d.slice(0, 2), vis.slice(2), rep === null ? new Set() : a.surl, "le board · " + noms[e]),
+        choix: choixCombos(), suivant: e < 2 ? (e === 0 ? "Voir le turn ▶" : "Voir la river ▶") : (m < 7 ? "Main suivante ▶" : null),
+      });
+    }
+  }
+  return qs;
+}
+function potEtMise() { for (;;) { const pot = choix([10, 20, 30, 40, 50, 60, 80, 100]), mise = pot * choix([.25, .5, .75, 1]); if (Number.isInteger(mise)) return [pot, mise]; } }
+function serie6() {
+  const qs = [];
+  for (let i = 0; i < 6; i++) {
+    const typ = choix(Object.keys(ATTENDU6)), [main, board, outs] = construireTirage(typ), n = outs.length;
+    const ch = [n, ...echantillon([2, 4, 6, 8, 9, 12, 15].filter(x => x !== n), 3)].sort((a, b) => a - b);
+    qs.push({ titre: `Combien d'outs as-tu pour ${OBJECTIFS6[typ]} ?`, tapis: [main, board, board.length === 3 ? "le flop" : "le turn"], bonne: String(n),
+      expl: `${n} outs. ${RAISONS6[typ]}`, apres: `<div class="minis">${outs.sort((a, b) => b[0] - a[0]).map(c => carte(c[0], c[1], { mini: true })).join("")}</div>`, choix: ch.map(x => C(x, x)) });
+  }
+  for (let i = 0; i < 3; i++) {
+    const o = choix([2, 4, 6, 8, 9, 12, 15]), flop = Math.random() < .5, bon = flop ? o * 4 : o * 2;
+    const cand = [...new Set([o * 2, o * 4, o * 3, o, o * 6, o + 10])].filter(v => v !== bon && v > 0 && v <= 95);
+    qs.push({ titre: "La règle du 2 et du 4", texte: flop ? `Tu es au flop avec ${o} outs.<br>Quelle est ta chance environ de toucher d'ici la river ?` : `Tu es au turn avec ${o} outs.<br>Quelle est ta chance environ de toucher à la river ?`,
+      bonne: String(bon), expl: flop ? `Au flop, il reste 2 cartes : ${o} × 4 ≈ ${bon} % (en réalité ${pctDeux(o).toFixed(0)} %).` : `Au turn, il reste 1 carte : ${o} × 2 ≈ ${bon} % (en réalité ${pctUne(o).toFixed(0)} %).`,
+      choix: [bon, ...echantillon(cand, 3)].sort((a, b) => a - b).map(v => C(v, `≈ ${v} %`)) });
+  }
+  for (let i = 0; i < 3; i++) {
+    let pot, mise, bon, cand;
+    for (;;) {
+      [pot, mise] = potEtMise(); const fin = pot + 2 * mise; bon = Math.round(100 * mise / fin);
+      cand = [...new Set([Math.round(100 * mise / (pot + mise)), Math.round(100 * mise / pot), 50, bon + 10, Math.max(5, bon - 10)])].filter(v => v !== bon && v <= 100);
+      if (cand.length >= 3) break;
+    }
+    const fin = pot + 2 * mise;
+    qs.push({ titre: "La cote du pot", texte: `Le pot est de ${pot} € et ton adversaire mise ${mise} €.<br>De combien de chances as-tu besoin, au minimum, pour suivre ?`,
+      bonne: String(bon), expl: `Tu paies ${mise} € pour un pot final de ${pot} + ${mise} + ${mise} = ${fin} €. ${mise} ÷ ${fin} ≈ ${bon} %.`,
+      choix: [bon, ...echantillon(cand, 3)].sort((a, b) => a - b).map(v => C(v, `${v} %`)) });
+  }
+  const tir = [[9, "un tirage couleur"], [8, "un tirage quinte bilatéral"], [4, "un tirage quinte ventral"], [15, "un tirage couleur + quinte"], [2, "une paire et tu espères le brelan"]];
+  for (let i = 0; i < 3; i++) {
+    let o, desc, pot, mise, besoin;
+    for (;;) { [o, desc] = choix(tir); [pot, mise] = potEtMise(); besoin = 100 * mise / (pot + 2 * mise); if (Math.abs(2 * o - besoin) >= 5) break; }
+    const ok = 2 * o > besoin;
+    qs.push({ titre: "Suivre ou se coucher ?", texte: `Au turn, tu as ${desc} (${o} outs).<br>Le pot est de ${pot} € et ton adversaire mise ${mise} €.`, bonne: ok ? "oui" : "non",
+      expl: `Il te faut ${mise} ÷ ${pot + 2 * mise} ≈ ${besoin.toFixed(0)} % et tu as environ ${o} × 2 = ${2 * o} %. ${ok ? "Ta chance est plus grande : suivre est rentable !" : "Ta chance est trop petite : mieux vaut se coucher."}`,
+      choix: [C("oui", "Je suis, c'est rentable"), C("non", "Je me couche")], uneCol: true });
+  }
+  return melanger(qs).map(q => ({ ...q, visuel: () => q.tapis ? tapisHTML(q.tapis[0], q.tapis[1], new Set(), "le board · " + q.tapis[2]) : `<div class="situation">${q.texte}</div>` }));
+}
+const SERIES = { "1exo": serie1, "2exo": serie2, "2bat": serieBat, "3exo": serie3, "4exo": serie4, "5exo": serie5, "6exo": serie6 };
+
+function vueSerie(id) {
+  let s = etat.series[id];
+  if (!s) s = etat.series[id] = { qs: SERIES[id](), i: 0, res: [], rep: null };
+  const total = s.qs.length, score = s.res.filter(Boolean).length;
+  if (s.i >= total) return finalHTML(id, score, total);
+  const q = s.qs[s.i], rep = s.rep;
+  const dots = s.qs.map((_, k) => `<i class="${k < s.res.length ? (s.res[k] ? "ok" : "ko") : k === s.i ? "cur" : ""}"></i>`).join("");
+  const compteur = q.compteurTxt || `${q.compteur || "Question"} ${s.i + 1} sur ${total}`;
+  let h = `<div class="progres">${compteur} · ${score} bonne${score > 1 ? "s" : ""} réponse${score > 1 ? "s" : ""}</div><div class="dots">${dots}</div>
+    <div class="question">${q.titre}</div>${q.sous ? `<div class="sous-q">${q.sous}</div>` : ""}${q.visuel(rep)}`;
+  if (q.choix) h += `<div class="choix ${q.uneCol ? "une-col" : ""}">${q.choix.map(c => `<button data-rep="${c.v}" class="${rep === null ? "" : c.v === q.bonne ? "bon" : c.v === rep ? "faux" : "eteint"}">${c.l}</button>`).join("")}</div>`;
+  if (rep !== null) {
+    const ok = rep === q.bonne;
+    h += `<div class="correction ${ok ? "bon" : "faux"}" id="correction">${ok ? "Bravo ! ✿ " : "Pas tout à fait… "}${q.expl}${q.apres || ""}</div>
+      <button class="btn principal" data-action="suivant">${s.i + 1 >= total ? "Voir mon score ✿" : (q.suivant || "Suivante ▶")}</button>`;
+  }
+  return h;
+}
+function finalHTML(id, score, total) {
+  const cle = "meilleur_" + id, avant = memoire.lire(cle, 0);
+  if (score > avant) memoire.ecrire(cle, score);
+  const t = score / total;
+  const msg = t === 1 ? "Parfait ! Un sans-faute ♡" : t >= .8 ? "Très bien ! Encore une série pour viser le sans-faute ?" : t >= .5 ? "Pas mal ! Un petit tour par « Découvrir » et on recommence." : "Pas de souci, on révise dans « Découvrir » et on réessaie ♡";
+  const n = +etat.route[1];
+  return `<div class="bloc final"><h3>✿ Série terminée ✿</h3><div class="score">${score} / ${total}</div><div class="msg">${msg}</div>
+    <p class="indice">Meilleur score : ${Math.max(score, avant)} / ${total}</p>
+    <button class="btn principal" data-action="recommencer">↻ Recommencer</button>
+    ${n < 6 ? `<button class="btn" style="margin-top:10px" data-nav="lecon/${n + 1}/dec">Leçon suivante : ${LECONS[n + 1].titre} ▶</button>` : ""}</div>${promoHTML()}`;
+}
+
+// ---------------------------------------------------------------- écrans
+function etoiles(n) {
+  const ids = Object.keys(SERIES).filter(k => k[0] === String(n));
+  const t = ids.reduce((a, id) => a + memoire.lire("meilleur_" + id, 0) / (id === "2exo" ? 20 : id === "5exo" ? 24 : id === "3exo" || id === "4exo" || id === "6exo" ? 15 : 10), 0) / ids.length;
+  const e = t >= .95 ? 3 : t >= .7 ? 2 : t > 0 ? 1 : 0;
+  return e ? "★".repeat(e) + "☆".repeat(3 - e) : "";
+}
+function accueil() {
+  return `<header class="barre"><h1>Apprendre le poker</h1><button class="rond" data-nav="apropos" aria-label="À propos">i</button></header><div class="filet"></div>
+  <div class="hero"><div class="eventail">${carte(12, 3)}${carte(12, 0)}${carte(11, 1)}</div>
+    <h2>Apprendre le poker</h2><p>Le Texas Hold'em pas à pas, leçon par leçon</p><div class="ornement">❦</div></div>
+  <div class="lecons">${LECONS.slice(1).map((l, i) => `<button class="lecon" data-nav="lecon/${i + 1}/dec"><span class="num">${i + 1}</span><span class="txt"><b>${l.titre}</b><span>${l.desc}</span>${etoiles(i + 1) ? `<span class="etoiles">${etoiles(i + 1)}</span>` : ""}</span><span class="fleche">›</span></button>`).join("")}</div>
+  ${promoHTML()}<p class="pied">Fait avec ♡ · <button data-nav="apropos">À propos et confidentialité</button></p>`;
+}
+function lecon(n, vue) {
+  const L = LECONS[n];
+  return `<header class="barre"><button class="rond" data-action="retour" aria-label="Retour">‹</button><h1>${n} · ${L.titre}</h1><a class="rond" href="${BOUTIQUE_URL}" target="_blank" rel="noopener" aria-label="Boutique">♡</a></header><div class="filet"></div>
+  <nav class="onglets">${L.onglets.map(([v, t]) => `<button class="${v === vue ? "actif" : ""}" data-nav="lecon/${n}/${v}" data-remplace="1">${t}</button>`).join("")}</nav>
+  <main class="contenu">${vue === "dec" ? DEC[n]() : vueSerie(n + vue)}</main>`;
+}
+function apropos() {
+  return `<header class="barre"><button class="rond" data-action="retour" aria-label="Retour">‹</button><h1>À propos</h1></header><div class="filet"></div><main class="contenu">
+  <div class="bloc"><h3>Apprendre le poker</h3><p>Une application pour découvrir le Texas Hold'em No Limit pas à pas : les cartes, les combinaisons, les positions, le déroulement d'une main, la lecture du board et les calculs de base, avec des exercices corrigés.</p>
+  <p>Cette application est purement éducative : on n'y joue pas d'argent et elle ne propose aucun jeu d'argent.</p></div>
+  <div class="bloc"><h3>Confidentialité</h3><p>L'application ne collecte, n'envoie et ne partage <b>aucune donnée personnelle</b>. Tes meilleurs scores et tes réglages sont seulement enregistrés sur ton téléphone. Il n'y a ni publicité, ni compte, ni traceur.</p></div>
+  ${promoHTML()}</main>`;
+}
+
+function rendre() {
+  const r = etat.route, app = document.getElementById("app");
+  if (r[0] === "lecon") app.innerHTML = lecon(+r[1], r[2]);
+  else if (r[0] === "apropos") app.innerHTML = apropos();
+  else app.innerHTML = accueil();
+}
+function aller(chemin, remplacer) {
+  etat.route = chemin.split("/");
+  const st = { route: etat.route };
+  if (remplacer) history.replaceState(st, "", "#" + chemin); else history.pushState(st, "", "#" + chemin);
+  rendre(); window.scrollTo(0, 0);
+}
+
+// ---------------------------------------------------------------- interactions
+const ACTES = {
+  coul: k => d1.s = +k, nota: v => { etat.notation = v; memoire.ecrire("notation", v); }, carte: i => { d1.r = +i; setTimeout(() => document.getElementById("detail")?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 30); },
+  combo: c => d2.ouvert = d2.ouvert === +c ? -1 : +c,
+  nbj: n => { d3.n = +n; d3.btn %= d3.n; d3.choisi = Math.min(d3.choisi, d3.n - 1); }, ordre: o => d3.ordre = o, siege: k => d3.choisi = +k, mainsuiv: () => d3.btn = (d3.btn + 1) % d3.n,
+  etape: k => d4.e = +k,
+  donne: () => { d5.donne = tirerDonne5(); d5.nb = 0; }, voir: () => d5.nb = d5.nb === 0 ? 3 : Math.min(5, d5.nb + 1),
+  sec: k => d6.sec = +k, tir: k => d6.t = d6.t === +k ? -1 : +k,
+  pas: (cle, sens) => { const [p, mi, ma] = { pot: [5, 5, 300], mise: [5, 5, 300], outs: [1, 1, 20] }[cle]; d6[cle] = Math.max(mi, Math.min(ma, d6[cle] + sens * p)); },
+};
+document.addEventListener("click", ev => {
+  const el = ev.target.closest("[data-nav],[data-action],[data-act],[data-rep]");
+  if (!el) return;
+  if (el.dataset.nav) { aller(el.dataset.nav, !!el.dataset.remplace); return; }
+  if (el.dataset.action === "retour") { if (history.state && history.length > 1 && etat.route[0] !== "accueil") history.back(); else aller("accueil", true); return; }
+  const id = etat.route[0] === "lecon" ? etat.route[1] + etat.route[2] : null, s = id && etat.series[id];
+  if (el.dataset.action === "suivant" && s) { s.i++; s.rep = null; rendre(); document.querySelector(".onglets")?.scrollIntoView(); window.scrollTo(0, 0); return; }
+  if (el.dataset.action === "recommencer" && id) { delete etat.series[id]; rendre(); window.scrollTo(0, 0); return; }
+  if (el.dataset.act) { const [nom, ...args] = el.dataset.act.split(":"); const y = window.scrollY; ACTES[nom](...args); rendre(); window.scrollTo(0, y); return; }
+  if (el.dataset.rep !== undefined && s && s.rep === null && s.i < s.qs.length) {
+    const q = s.qs[s.i]; s.rep = el.dataset.rep; s.res.push(s.rep === q.bonne);
+    const y = window.scrollY; rendre(); window.scrollTo(0, y);
+    document.getElementById("correction")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+});
+window.addEventListener("popstate", ev => { etat.route = (ev.state && ev.state.route) || ["accueil"]; rendre(); window.scrollTo(0, 0); });
+
+document.body.insertAdjacentHTML("afterbegin", defsSVG());
+history.replaceState({ route: ["accueil"] }, "", "#accueil");
+rendre();
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+</script>
+</body>
+</html>
